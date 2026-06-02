@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALIS® | The Story of Intelligence</title>
+    <meta name="description" content="A cinematic journey into the future of adaptive learning.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'alis_app/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'alis_app/css/intro.css' %}">
+    <meta name="theme-color" content="#000000">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" defer></script>
+    <script src="{% static 'alis_app/js/intro.js' %}" defer></script>
+</head>
+<body class="alis-intro">
+    <div id="introData" data-next-url="{% url 'showcase' %}" data-intro-seen-key="alis_intro_movie_seen_v6" style="display:none;"></div>
+    <div class="intro-vignette" aria-hidden="true"></div>
+    
+    <header class="intro-hud">
+        <div class="intro-brand" aria-label="ALIS">
+            <span class="intro-brand__mark">ALIS</span><span class="intro-brand__reg">®</span>
+        </div>
+
+        <div class="intro-controls">
+            <div class="intro-progress" aria-label="Intro progress">
+                <div class="intro-progress__track">
+                    <div id="progressFill" class="intro-progress__fill"></div>
+                </div>
+            </div>
+            <button id="skipIntro" class="btn-ghost intro-skip" type="button">Skip Intro</button>
+        </div>
+    </header>
+
+    <main class="intro-stage">
+        <!-- High-Fidelity Narrative Theatre -->
+        <svg id="storySvg" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="15" result="blur"/>
+                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                </filter>
+                <linearGradient id="goldHolo" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#D4AF37" stop-opacity="0.8"/>
+                    <stop offset="0.5" stop-color="#FFF4C4" stop-opacity="0.4"/>
+                    <stop offset="1" stop-color="#D4AF37" stop-opacity="0.8"/>
+                </linearGradient>
+                <linearGradient id="cardGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="rgba(255,255,255,0.05)"/>
+                    <stop offset="1" stop-color="rgba(255,255,255,0.01)"/>
+                </linearGradient>
+            </defs>
+
+            <!-- Environment Layer -->
+            <g id="env" opacity="0.2">
+                <line x1="200" y1="650" x2="1000" y2="650" stroke="rgba(255,255,255,0.1)"/>
+            </g>
+
+            <!-- SCENE 1: Struggling Student -->
+            <g id="scene1" opacity="0" transform="translate(600 550)">
+                <g id="student1">
+                    <path d="M-45 80 L-40 0 C-40 -35 -25 -55 0 -55 C25 -55 40 -35 40 0 L45 80 Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+                    <circle cx="0" cy="-85" r="30" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+                </g>
+                <g id="confusion" opacity="0">
+                    <path d="M-30 -120 Q-50 -160 0 -160 Q50 -160 30 -120" fill="none" stroke="#ff5555" stroke-width="1.5" stroke-dasharray="4 4"/>
+                    <text y="-140" text-anchor="middle" fill="#ff5555" font-family="Inter" font-size="24" font-weight="bold">?</text>
+                </g>
+            </g>
+
+            <!-- SCENE 2: Traditional Classroom Grid -->
+            <g id="scene2" opacity="0">
+                <g transform="translate(300 450)" opacity="0.1">
+                    <rect x="-120" y="-80" width="240" height="160" fill="none" stroke="rgba(255,255,255,0.1)" stroke-dasharray="2 2"/>
+                    <path d="M-15 30 L-13 0 C-13 -15 -8 -25 0 -25 C8 -25 13 -15 13 0 L15 30" fill="rgba(255,255,255,0.1)"/>
+                </g>
+                <g transform="translate(900 450)" opacity="0.1">
+                    <rect x="-120" y="-80" width="240" height="160" fill="none" stroke="rgba(255,255,255,0.1)" stroke-dasharray="2 2"/>
+                    <path d="M-15 30 L-13 0 C-13 -15 -8 -25 0 -25 C8 -25 13 -15 13 0 L15 30" fill="rgba(255,255,255,0.1)"/>
+                </g>
+                <g transform="translate(600 350)" opacity="0.2">
+                    <path d="M-50 80 L-45 0 C-45 -40 -30 -60 0 -60 C30 -60 45 -40 45 0 L50 80 Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+                    <circle cx="0" cy="-90" r="32" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+                </g>
+            </g>
+
+            <!-- SCENE 3: ALIS AI Hologram -->
+            <g id="scene3" opacity="0" transform="translate(600 400)">
+                <circle r="220" fill="none" stroke="url(#goldHolo)" stroke-width="0.5" stroke-dasharray="10 10"/>
+                <path id="holoRing" d="M-170 0 A170 170 0 1 1 170 0 A170 170 0 1 1 -170 0" fill="none" stroke="var(--gold-primary)" stroke-width="1.5" stroke-dasharray="100 30"/>
+                <rect id="scanPulse" x="-300" y="-1" width="600" height="2" fill="url(#goldHolo)" opacity="0"/>
+            </g>
+
+            <!-- SCENE 4: Technical Diagnostics (Cards) -->
+            <g id="scene4" opacity="0" transform="translate(600 400)">
+                <!-- Strength Card -->
+                <g id="strengthCard" transform="translate(-180 0)">
+                    <rect x="-140" y="-120" width="280" height="240" rx="15" fill="url(#cardGrad)" stroke="rgba(212,175,55,0.2)"/>
+                    <text y="-80" text-anchor="middle" fill="var(--gold-primary)" font-family="Inter" font-size="12" letter-spacing="4" font-weight="600">STRENGTHS</text>
+                    <g transform="translate(0 -30)">
+                        <text text-anchor="middle" fill="#EDEDED" font-family="Inter" font-size="16">DBMS STRUCTURE ✓</text>
+                        <text y="30" text-anchor="middle" fill="#EDEDED" font-family="Inter" font-size="16">SQL BASICS ✓</text>
+                    </g>
+                    <circle r="30" cy="60" fill="rgba(212,175,55,0.1)" stroke="var(--gold-primary)" stroke-width="1"/>
+                    <path d="M-10 60 L-3 70 L12 50" fill="none" stroke="var(--gold-primary)" stroke-width="3" stroke-linecap="round"/>
+                </g>
+                <!-- Weakness Card -->
+                <g id="weaknessCard" transform="translate(180 0)">
+                    <rect x="-140" y="-120" width="280" height="240" rx="15" fill="url(#cardGrad)" stroke="rgba(255,85,85,0.2)"/>
+                    <text y="-80" text-anchor="middle" fill="#ff5555" font-family="Inter" font-size="12" letter-spacing="4" font-weight="600">GAPS DETECTED</text>
+                    <g transform="translate(0 -30)">
+                        <text text-anchor="middle" fill="#EDEDED" font-family="Inter" font-size="16">SQL JOINS ✗</text>
+                        <text y="30" text-anchor="middle" fill="#EDEDED" font-family="Inter" font-size="16">PROBABILITY ✗</text>
+                    </g>
+                    <circle r="30" cy="60" fill="rgba(255,85,85,0.1)" stroke="#ff5555" stroke-width="1"/>
+                    <path d="M-8 52 L8 68 M8 52 L-8 68" fill="none" stroke="#ff5555" stroke-width="3" stroke-linecap="round"/>
+                </g>
+            </g>
+
+            <!-- SCENE 5: Precision Pathing -->
+            <g id="scene5" opacity="0" transform="translate(600 400)">
+                <path id="roadmap" d="M-400 100 Q-200 -100 0 100 T400 -100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="2"/>
+                <path id="activeRoadmap" d="M-400 100 Q-200 -100 0 100 T400 -100" fill="none" stroke="var(--gold-primary)" stroke-width="3" stroke-dasharray="1 1000"/>
+                <circle cx="-400" cy="100" r="8" fill="var(--gold-primary)"/>
+                <circle id="targetNode" cx="400" cy="-100" r="10" fill="none" stroke="var(--gold-primary)" stroke-width="2"/>
+            </g>
+
+            <!-- SCENE 6: Empowered Mentor -->
+            <g id="scene6" opacity="0" transform="translate(600 400)">
+                <g id="teacherProfessional" transform="translate(250 150)">
+                    <path d="M-50 80 L-45 0 C-45 -40 -30 -60 0 -60 C30 -60 45 -40 45 0 L50 80 Z" fill="rgba(212,175,55,0.05)" stroke="rgba(212,175,55,0.2)"/>
+                    <circle cx="0" cy="-90" r="32" fill="rgba(212,175,55,0.05)" stroke="rgba(212,175,55,0.2)"/>
+                    <!-- Tablet -->
+                    <g transform="translate(40 0)">
+                        <rect width="50" height="75" rx="4" fill="#000" stroke="var(--gold-primary)"/>
+                        <path d="M5 15 H45 M5 25 H30 M5 35 H40" stroke="var(--gold-primary)" stroke-opacity="0.5" stroke-width="1.5"/>
+                    </g>
+                </g>
+                <!-- Guidance Link -->
+                <path d="M-150 0 L150 0" stroke="var(--gold-primary)" stroke-width="0.5" stroke-dasharray="5 5" opacity="0.3"/>
+            </g>
+
+            <!-- SCENE 8: Success State -->
+            <g id="scene8" opacity="0" transform="translate(600 400)">
+                <circle r="150" fill="none" stroke="var(--gold-primary)" stroke-width="1" opacity="0.2" filter="url(#goldGlow)"/>
+                <path id="checkSuccess" d="M-50 0 L-10 50 L80 -50" fill="none" stroke="var(--gold-primary)" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
+            </g>
+
+            <!-- SCENE 9: Luxury Finale -->
+            <g id="scene9" opacity="0" transform="translate(600 400)">
+                <text text-anchor="middle" fill="#EDEDED" font-family="Inter" font-weight="200" font-size="140" letter-spacing="40">ALIS</text>
+                <text y="80" text-anchor="middle" fill="var(--gold-primary)" font-family="Inter" font-size="12" letter-spacing="12" font-weight="400">ADAPTIVE LEARNING INTELLIGENCE SYSTEM</text>
+                <text y="130" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-family="Inter" font-size="16" font-style="italic" font-weight="300">"Your Personal Learning Intelligence"</text>
+            </g>
+        </svg>
+
+        <!-- Narrative Caption Interface -->
+        <div class="intro-caption-container">
+            <p id="caption" class="h-editorial"></p>
+        </div>
+
+        <!-- System Activation Interface -->
+        <div class="intro-cta">
+            <button id="initIntel" class="btn-premium intro-init" type="button">Initialize Intelligence</button>
+            <button class="btn-ghost intro-alt" onclick="document.getElementById('skipIntro').click()">Access Platform</button>
+        </div>
+    </main>
+</body>
+</html>

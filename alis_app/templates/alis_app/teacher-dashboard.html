@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALIS® | Teacher Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'alis_app/css/style.css' %}">
+</head>
+<body class="animate-in">
+    <div class="bg-mesh"></div>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">ALIS<span>®</span></div>
+            
+            <nav class="nav-group">
+                <div class="nav-label">Management</div>
+                <a href="#" class="nav-item active">Classroom Center</a>
+                <a href="#" class="nav-item">Student Roster</a>
+                <a href="#" class="nav-item">Analytics Hub</a>
+            </nav>
+
+            <nav class="nav-group">
+                <div class="nav-label">Intelligence</div>
+                <a href="#" class="nav-item">Forecasting</a>
+                <a href="#" class="nav-item">Lesson Planner</a>
+                <a href="#" class="nav-item">AI Insights</a>
+            </nav>
+
+            <div style="margin-top: auto;">
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; cursor: pointer;">Log Out</button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-wrapper">
+            <header class="app-header">
+                <div>
+                    <div class="text-mono">Classroom Intelligence Center // {{ today|date:"M d, Y"|default:"Active Session" }}</div>
+                    <h1 class="h-editorial" style="font-size: 3.5rem; margin-top: 0.5rem;">Intelligence Overview.</h1>
+                </div>
+                <div style="text-align: right;">
+                    <div class="text-mono" style="color: var(--text-muted);">Active Students</div>
+                    <div class="h-editorial" style="font-size: 2rem;">{{ students.count|default:"0" }}</div>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Intelligence Alerts -->
+                <section class="col-6">
+                    <div class="glass-panel" style="padding: 2rem; border-left: 2px solid var(--gold-primary);">
+                        <div class="text-mono" style="margin-bottom: 1rem; color: var(--gold-primary);">Critical Alert // At-Risk Detection</div>
+                        <h3 class="h-editorial" style="font-size: 1.8rem; margin-bottom: 0.5rem;">{{ analytics.at_risk_count|default:"0" }} Students require intervention.</h3>
+                        <p class="text-muted" style="font-size: 0.95rem;">Our AI has detected significant risk scores in your classroom. Recommended: targeted review sessions for flagged individuals.</p>
+                        <div style="margin-top: 1.5rem;">
+                            <a href="{% url 'create_assessment' %}" class="btn-premium">Create Intervention Quiz</a>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="col-6">
+                    <div class="glass-panel" style="padding: 2rem;">
+                        <div class="text-mono" style="margin-bottom: 1rem;">Class Weakness Analysis</div>
+                        <h3 class="h-editorial" style="font-size: 1.8rem; margin-bottom: 0.5rem;">
+                            {% if analytics.common_weaknesses %}
+                                Bottleneck: {{ analytics.common_weaknesses.0.0 }}
+                            {% else %}
+                                Analysis Stable.
+                            {% endif %}
+                        </h3>
+                        <p class="text-muted" style="font-size: 0.95rem;">
+                            {% if analytics.common_weaknesses %}
+                                {{ analytics.common_weaknesses.0.1 }} students are struggling with this concept. The AI suggests a conceptual deep-dive session.
+                            {% else %}
+                                No major conceptual bottlenecks detected across the cohort.
+                            {% endif %}
+                        </p>
+                        <div style="margin-top: 1.5rem;">
+                            <a href="#" class="btn-ghost">Generate Class Report</a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Student Table -->
+                <section class="col-12" style="margin-top: 2rem;">
+                    <div class="glass-panel" style="padding: 2rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                            <div class="text-mono">Student Intelligence Roster</div>
+                            <input type="text" id="studentSearch" placeholder="Search roster..." style="background: var(--bg-surface); border: 1px solid var(--border-dim); border-radius: 6px; padding: 0.5rem 1rem; color: var(--text-primary); font-size: 0.85rem; width: 250px; outline: none;">
+                        </div>
+
+                        <table class="luxury-table">
+                            <thead>
+                                <tr>
+                                    <th>Learner Identity</th>
+                                    <th>Intelligence Level</th>
+                                    <th>Accuracy Index</th>
+                                    <th>Risk Score</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentList">
+                                {% for student in students %}
+                                <tr class="student-row">
+                                    <td>
+                                        <div style="font-weight: 500; color: var(--text-primary);">{{ student.first_name|default:student.username }}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ student.email }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="text-mono" style="font-size: 0.7rem; color: {% if student.level == 'Strong' %}var(--gold-primary){% elif student.level == 'Weak' %}#ff5555{% else %}var(--text-secondary){% endif %};">
+                                            {{ student.level|default:"Pending" }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div style="width: 80px; height: 2px; background: var(--border-dim);">
+                                                <div style="height: 100%; background: var(--gold-primary); width: {{ student.last_quiz_score|default:0 }}%;"></div>
+                                            </div>
+                                            <span style="font-size: 0.85rem;">{{ student.last_quiz_score|default:"0" }}%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-mono" style="color: {% if student.risk_score > 60 %}#ff5555{% else %}var(--text-muted){% endif %};">
+                                            {{ student.risk_score|floatformat:1 }}%
+                                        </span>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <a href="{% url 'student_profile' student.id %}" class="btn-ghost" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; text-decoration: none;">Inspect DNA</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 4rem; opacity: 0.5;">No intelligence data available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('studentSearch').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.student-row');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

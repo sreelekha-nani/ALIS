@@ -1,0 +1,1026 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALIS® | The Future of Personalized Learning</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'alis_app/css/style.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <style>
+        :root {
+            --gold-primary: #D4AF37;
+            --gold-dim: rgba(212, 175, 55, 0.15);
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --bg-dark: #050505;
+            --text-secondary: #8A8A8A;
+            --nav-height: 80px;
+        }
+
+        html {
+            scroll-behavior: auto; /* Managed by GSAP */
+        }
+
+        body { 
+            background: #000; 
+            overflow-x: hidden; 
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Premium Background */
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.03) 0%, transparent 40%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .showcase-nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: var(--nav-height);
+            padding: 0 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .nav-item-wrapper {
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .nav-links a.active {
+            color: var(--gold-primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0%;
+            height: 1px;
+            background: var(--gold-primary);
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .showcase-hero {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 3rem 5% 1rem 8%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-split {
+            display: grid;
+            grid-template-columns: 45% 55%;
+            gap: 1rem;
+            width: 100%;
+            max-width: 1800px;
+            margin: 0 auto;
+            align-items: center;
+        }
+
+        .hero-left {
+            z-index: 10;
+        }
+
+        .hero-right {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60vh;
+        }
+
+        /* Headlines */
+        .h-editorial {
+            font-family: 'Instrument Serif', serif;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+        }
+
+        .text-gradient-gold {
+            background: linear-gradient(to right, #D4AF37, #FFF4C4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(15, 15, 15, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            padding: 1.5rem;
+        }
+
+        .glass-card:hover {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+            transform: translateY(-5px);
+            background: rgba(25, 25, 25, 0.8);
+        }
+
+        /* Neural Nodes */
+        .neural-node {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            z-index: 5;
+        }
+
+        .neural-node.core-node {
+            width: 350px;
+            height: 350px;
+            border-width: 2px;
+            border-color: rgba(212, 175, 55, 0.5);
+            background: rgba(10, 10, 10, 0.85);
+            box-shadow: 0 0 80px rgba(212, 175, 55, 0.15);
+        }
+
+        .node-icon { 
+            font-size: 3.5rem; 
+            margin-bottom: 1.2rem;
+            filter: drop-shadow(0 0 15px var(--gold-dim));
+        }
+        
+        .core-node .node-icon { font-size: 6.5rem; }
+
+        .node-label { 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.3em; 
+            color: var(--gold-primary); 
+            text-align: center; 
+            font-weight: 800; 
+        }
+
+        .neural-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .connection-line {
+            stroke: var(--gold-primary);
+            stroke-width: 2;
+            fill: none;
+            opacity: 0.15;
+        }
+
+        .pulse-line {
+            stroke: var(--gold-primary);
+            stroke-width: 3.5;
+            fill: none;
+            opacity: 0;
+            stroke-linecap: round;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 2rem 5%;
+            background: #000;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: clamp(2rem, 3.5vw, 3.5rem);
+            font-family: 'Instrument Serif', serif;
+            color: var(--gold-primary);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-secondary);
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 3rem 5%;
+            background: #000;
+            scroll-margin-top: var(--nav-height);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-tag {
+            color: var(--gold-primary);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            padding: 2.25rem 2rem;
+            text-align: left;
+            height: 100%;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.25rem;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.6rem;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+
+        .feature-desc {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* AI Engine Process Section */
+        .ai-process-section {
+            padding: 3rem 5%;
+            background: #030303;
+            scroll-margin-top: var(--nav-height);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .process-flow-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            padding: 1rem 0;
+        }
+
+        .process-flow-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .process-node {
+            padding: 1.25rem;
+            text-align: center;
+            border-radius: 20px;
+            transition: all 0.4s ease;
+        }
+
+        .process-node:hover {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .process-label {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.4rem;
+            color: #fff;
+            letter-spacing: 0.05em;
+        }
+
+        .process-sub {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 3rem 5%;
+            background: #050505;
+            scroll-margin-top: var(--nav-height);
+        }
+
+        .about-main-grid {
+            display: grid;
+            grid-template-columns: 40% 60%;
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .about-explainer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+
+        .explainer-card {
+            padding: 1.75rem;
+            height: 100%;
+        }
+
+        .explainer-card h4 {
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.02em;
+        }
+
+        .explainer-card p {
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        /* Success Metrics */
+        .success-metrics {
+            padding: 3rem 5%;
+            background: #000;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Final CTA */
+        .final-cta {
+            padding: 3rem 5%;
+            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.1) 0%, transparent 60%);
+            text-align: center;
+        }
+
+        /* Buttons */
+        .btn-premium {
+            background: var(--gold-dim);
+            color: var(--gold-primary);
+            border: 1px solid var(--gold-dim);
+            padding: 1rem 2.5rem;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .btn-premium:hover {
+            background: var(--gold-primary);
+            color: #000;
+            box-shadow: 0 0 20px var(--gold-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-gold {
+            background: transparent;
+            border: 1px solid var(--gold-dim);
+            color: var(--gold-primary);
+            padding: 1rem 2.5rem;
+            border-radius: 100px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.85rem;
+        }
+
+        .btn-outline-gold:hover {
+            border-color: var(--gold-primary);
+            background: rgba(212, 175, 55, 0.05);
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 1024px) {
+            .hero-split { grid-template-columns: 1fr; text-align: center; }
+            .hero-right { height: 60vh; margin-top: 4rem; }
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 4rem; }
+            .hero-left { display: flex; flex-direction: column; align-items: center; }
+            .about-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .features-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; gap: 3rem; }
+            .nav-links { display: none; }
+            .about-tabs { grid-template-columns: 1fr; }
+        }
+
+        .floating-controls {
+            position: fixed;
+            left: 2.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            z-index: 100;
+        }
+
+        .float-btn {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .float-btn:hover {
+            background: var(--gold-dim);
+            border-color: var(--gold-primary);
+            transform: scale(1.1) translateX(5px);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+        }
+
+        .float-label {
+            position: absolute;
+            left: 70px;
+            white-space: nowrap;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--gold-primary);
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            font-weight: 600;
+            background: rgba(0,0,0,0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: 1px solid var(--gold-dim);
+        }
+
+        .float-btn:hover .float-label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+
+    <nav class="showcase-nav">
+        <a href="#" class="sidebar-logo" style="letter-spacing: 0.5em; font-size: 1.4rem; color: #fff; text-decoration: none;">ALIS<span>®</span></a>
+        <div class="nav-links">
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#ai-engine" class="nav-link">AI Engine</a>
+            <a href="#about" class="nav-link">About ALIS</a>
+            <a href="{% url 'login' %}" class="btn-premium" style="padding: 0.6rem 1.8rem; font-size: 0.75rem;">Access Platform</a>
+        </div>
+    </nav>
+
+    <div class="floating-controls">
+        <div class="float-btn" title="AI Chatbot">
+            <span style="font-size: 1.4rem;">💬</span>
+            <span class="float-label">AI Chatbot</span>
+        </div>
+        <div class="float-btn" title="Voice Tutor">
+            <span style="font-size: 1.4rem;">🎙️</span>
+            <span class="float-label">Voice Tutor</span>
+        </div>
+    </div>
+
+    <main class="showcase-hero" id="home">
+        <div class="hero-split">
+            <div class="hero-left">
+                <div style="margin-bottom: 2rem; color: var(--gold-primary); letter-spacing: 0.4em; font-size: 0.7rem; display: flex; align-items: center; text-transform: uppercase;">
+                    <div style="width: 8px; height: 8px; background: var(--gold-primary); border-radius: 50%; margin-right: 12px; box-shadow: 0 0 10px var(--gold-primary);"></div>
+                    System // Personalization Active
+                </div>
+                <h1 class="h-editorial" style="font-size: clamp(3.5rem, 8vw, 6.5rem); margin-bottom: 2rem; line-height: 1.05;">
+                    Learning.<br>
+                    Intelligent.<br>
+                    <span class="text-gradient-gold" style="font-style: italic;">Personalized.</span>
+                </h1>
+                <p style="max-width: 600px; font-size: 1.25rem; line-height: 1.6; margin-bottom: 4rem; color: var(--text-secondary); font-weight: 300;">
+                    ALIS transforms education through adaptive intelligence, real-time learning analytics, and personalized pathways designed for every student.
+                </p>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center;">
+                    <a href="{% url 'login' %}" class="btn-premium">Start Learning</a>
+                    <a href="#features" class="btn-outline-gold nav-link">Explore AI Features</a>
+                    <a href="{% url 'login' %}" style="color: var(--gold-primary); text-decoration: none; font-size: 0.9rem; margin-left: 1rem; border-bottom: 1px solid var(--gold-dim);">Sign In To Platform</a>
+                </div>
+            </div>
+
+            <div class="hero-right" id="ai-engine-viz">
+                <div class="neural-container" id="neural-viz" style="width: 100%; height: 100%; min-width: 700px;">
+                    <svg class="neural-svg" id="neural-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet">
+                        <defs>
+                            <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="8" result="blur"/>
+                                <feMerge>
+                                    <feMergeNode in="blur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+                    </svg>
+                    
+                    <!-- CENTRAL CORE -->
+                    <div class="neural-node glass-card core-node" id="node-brain" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                        <span class="node-icon">🧠</span>
+                        <span class="node-label">AI Brain</span>
+                    </div>
+
+                    <!-- PERIPHERAL NODES -->
+                    <!-- Student (12 o'clock) -->
+                    <div class="neural-node glass-card" id="node-student" style="top: 10%; left: 50%; transform: translateX(-50%);">
+                        <span class="node-icon">🎓</span>
+                        <span class="node-label">Student</span>
+                    </div>
+
+                    <!-- Teacher (2 o'clock) -->
+                    <div class="neural-node glass-card" id="node-teacher" style="top: 25%; right: 5%; transform: translateY(-50%);">
+                        <span class="node-icon">👔</span>
+                        <span class="node-label">Teacher</span>
+                    </div>
+
+                    <!-- Learning Content (4 o'clock) -->
+                    <div class="neural-node glass-card" id="node-content" style="bottom: 25%; right: 5%; transform: translateY(50%);">
+                        <span class="node-icon">📚</span>
+                        <span class="node-label">Learning Content</span>
+                    </div>
+
+                    <!-- Analytics (8 o'clock) -->
+                    <div class="neural-node glass-card" id="node-analytics" style="bottom: 25%; left: 5%; transform: translateY(50%);">
+                        <span class="node-icon">📊</span>
+                        <span class="node-label">Analytics</span>
+                    </div>
+
+                    <!-- Adaptive Engine (10 o'clock) -->
+                    <div class="neural-node glass-card" id="node-engine" style="top: 25%; left: 5%; transform: translateY(-50%);">
+                        <span class="node-icon">⚙️</span>
+                        <span class="node-label">Adaptive Engine</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value"><span class="counter" data-target="10000">0</span>+</div>
+                <div class="stat-label">Students</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value"><span class="counter" data-target="500">0</span>+</div>
+                <div class="stat-label">Teachers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value"><span class="counter" data-target="95">0</span>%</div>
+                <div class="stat-label">Prediction Accuracy</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">24/7</div>
+                <div class="stat-label">AI Tutor</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section" id="features">
+        <div class="section-header">
+            <span class="section-tag">Capabilities</span>
+            <h2 class="h-editorial" style="font-size: 3rem;">Built for the Future.</h2>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card glass-card">
+                <span class="feature-icon">🎓</span>
+                <h3 class="feature-title">Adaptive Learning</h3>
+                <p class="feature-desc">Personalized learning paths generated dynamically from student performance and behavior.</p>
+            </div>
+            <div class="feature-card glass-card">
+                <span class="feature-icon">📊</span>
+                <h3 class="feature-title">Student Analytics</h3>
+                <p class="feature-desc">Real-time performance tracking and deep insights into individual learning progression.</p>
+            </div>
+            <div class="feature-card glass-card">
+                <span class="feature-icon">👔</span>
+                <h3 class="feature-title">Teacher Command Center</h3>
+                <p class="feature-desc">Manage classrooms, monitor progress, and deliver intelligent interventions in one place.</p>
+            </div>
+            <div class="feature-card glass-card">
+                <span class="feature-icon">💬</span>
+                <h3 class="feature-title">AI Tutor</h3>
+                <p class="feature-desc">24/7 personalized assistance providing explanations and guidance whenever needed.</p>
+            </div>
+            <div class="feature-card glass-card">
+                <span class="feature-icon">🎯</span>
+                <h3 class="feature-title">Cognitive Assessment</h3>
+                <p class="feature-desc">Continuous evaluation to detect skill gaps and measure true conceptual mastery.</p>
+            </div>
+            <div class="feature-card glass-card">
+                <span class="feature-icon">⚙️</span>
+                <h3 class="feature-title">Intelligence Engine</h3>
+                <p class="feature-desc">Predictive recommendations powered by advanced neural network models.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="ai-process-section" id="ai-flow">
+        <div class="section-header">
+            <span class="section-tag">AI Engine</span>
+            <h2 class="h-editorial" style="font-size: 3rem;">The Symphony of Intelligence.</h2>
+            <p style="color: var(--text-secondary); max-width: 600px; margin: 0.5rem auto 0;">Watch how data transforms into personalized learning experiences.</p>
+        </div>
+        <div class="process-flow-container">
+            <div class="process-grid">
+                <div class="process-node glass-card">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">🎓</div>
+                    <div class="process-label">Student Action</div>
+                    <div class="process-sub">Input & Behavior</div>
+                </div>
+                <div class="process-node glass-card">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">🧠</div>
+                    <div class="process-label">AI Brain</div>
+                    <div class="process-sub">Cognitive Processing</div>
+                </div>
+                <div class="process-node glass-card">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">⚙️</div>
+                    <div class="process-label">Adaptive Engine</div>
+                    <div class="process-sub">Path Recalculation</div>
+                </div>
+                <div class="process-node glass-card">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">🎯</div>
+                    <div class="process-label">Recommendation</div>
+                    <div class="process-sub">Personalized Content</div>
+                </div>
+                <div class="process-node glass-card">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">👔</div>
+                    <div class="process-label">Teacher Insights</div>
+                    <div class="process-sub">Actionable Alerts</div>
+                </div>
+                <div class="process-node glass-card">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">📊</div>
+                    <div class="process-label">Analytics</div>
+                    <div class="process-sub">Growth Tracking</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-main-grid">
+            <div class="about-content">
+                <span class="section-tag">About ALIS</span>
+                <h2 class="h-editorial" style="font-size: 3rem;">Engineering Human Potential.</h2>
+                <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 1.5rem; font-size: 1.1rem;">
+                    ALIS is not just a platform; it's a paradigm shift in how we approach human development. By bridging the gap between cognitive science and artificial intelligence, we create a symbiotic environment where learning is as unique as a fingerprint.
+                </p>
+                <a href="{% url 'login' %}" class="btn-premium">Join the Revolution</a>
+            </div>
+            <div class="about-explainer-grid">
+                <div class="explainer-card glass-card">
+                    <h4>Vision</h4>
+                    <p>A world where every individual's learning potential is fully realized through seamless AI partnership.</p>
+                </div>
+                <div class="explainer-card glass-card">
+                    <h4>Mission</h4>
+                    <p>To provide the most advanced adaptive learning infrastructure for educational institutions worldwide.</p>
+                </div>
+                <div class="explainer-card glass-card">
+                    <h4>Purpose</h4>
+                    <p>To eliminate educational barriers and provide personalized, high-quality tutoring for every student, everywhere.</p>
+                </div>
+                <div class="explainer-card glass-card">
+                    <h4>How it Works</h4>
+                    <p>Our neural engine maps student behavior to cognitive models, adjusting difficulty and content in real-time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="success-metrics">
+        <div class="section-header">
+            <span class="section-tag">Impact</span>
+            <h2 class="h-editorial" style="font-size: 3rem;">Proven Results.</h2>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value"><span class="counter" data-target="98">0</span>%</div>
+                <div class="stat-label">Learning Accuracy</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value"><span class="counter" data-target="4">0</span>x</div>
+                <div class="stat-label">Student Improvement</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value"><span class="counter" data-target="95">0</span>%</div>
+                <div class="stat-label">Teacher Satisfaction</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value"><span class="counter" data-target="100">0</span>%</div>
+                <div class="stat-label">Adaptive Support</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="final-cta">
+        <h2 class="h-editorial" style="font-size: 3.5rem; margin-bottom: 1.5rem;">Ready To Experience Adaptive Intelligence?</h2>
+        <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+            <a href="{% url 'login' %}" class="btn-premium">Start Learning</a>
+            <a href="{% url 'login' %}" class="btn-outline-gold">Access Platform</a>
+        </div>
+    </section>
+
+    <footer style="padding: 3rem 5%; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
+        <div class="sidebar-logo" style="letter-spacing: 0.5em; font-size: 1.2rem; margin-bottom: 1.5rem;">ALIS<span>®</span></div>
+        <p style="font-size: 0.7rem; color: var(--text-secondary); letter-spacing: 0.1em; text-transform: uppercase;">© 2026 ALIS COGNITIVE SYSTEMS. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+            // Smooth Scroll
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = e.target.getAttribute('href');
+                    gsap.to(window, {
+                        duration: 1.5,
+                        scrollTo: {
+                            y: target,
+                            offsetY: 80
+                        },
+                        ease: 'power4.inOut'
+                    });
+                });
+            });
+
+            // Active State Handler
+            const sections = document.querySelectorAll('main, section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (pageYOffset >= (sectionTop - 150)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // Hero Entrance
+            const tl = gsap.timeline();
+            tl.from('.showcase-nav', { y: -50, opacity: 0, duration: 1, ease: 'power3.out' })
+              .from('.hero-left > *', { y: 40, opacity: 0, duration: 1.2, stagger: 0.2, ease: 'power3.out' }, '-=0.5')
+              .from('.neural-node', { scale: 0.8, opacity: 0, duration: 1, stagger: 0.1, ease: 'back.out(1.7)' }, '-=1');
+
+            // Neural Network Logic
+            const svg = document.getElementById('neural-svg');
+            const nodes = document.querySelectorAll('.neural-node');
+            const brain = document.getElementById('node-brain');
+            const vizContainer = document.getElementById('neural-viz');
+            
+            function connectNodes() {
+                const defs = svg.querySelector('defs');
+                svg.innerHTML = '';
+                svg.appendChild(defs);
+
+                const containerRect = vizContainer.getBoundingClientRect();
+                const brainRect = brain.getBoundingClientRect();
+                
+                if (containerRect.width === 0) return;
+
+                // Map to 1000x800 SVG coordinate system
+                const bx = (brainRect.left + brainRect.width / 2 - containerRect.left) * (1000 / containerRect.width);
+                const by = (brainRect.top + brainRect.height / 2 - containerRect.top) * (600 / containerRect.height);
+
+                if (!Number.isFinite(bx)) return;
+
+                nodes.forEach(node => {
+                    if (node.id === 'node-brain') return;
+                    
+                    const rect = node.getBoundingClientRect();
+                    const nx = (rect.left + rect.width / 2 - containerRect.left) * (1000 / containerRect.width);
+                    const ny = (rect.top + rect.height / 2 - containerRect.top) * (800 / containerRect.height);
+
+                    if (!Number.isFinite(nx)) return;
+
+                    // Dynamic Curve Logic: Bulge outward from center
+                    const dx = nx - bx;
+                    const dy = ny - by;
+                    
+                    let cp1x, cp1y;
+                    const bulge = 100; 
+
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        cp1x = bx + dx * 0.5;
+                        cp1y = by + dy * 0.5 + (dy > 0 ? -bulge : bulge);
+                    } else {
+                        cp1x = bx + dx * 0.5 + (dx > 0 ? bulge : -bulge);
+                        cp1y = by + dy * 0.5;
+                    }
+
+                    const d = `M ${bx} ${by} Q ${cp1x} ${cp1y} ${nx} ${ny}`;
+
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    line.setAttribute('d', d);
+                    line.setAttribute('class', 'connection-line');
+                    svg.appendChild(line);
+
+                    const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    pulse.setAttribute('d', d);
+                    pulse.setAttribute('class', 'pulse-line');
+                    pulse.setAttribute('filter', 'url(#goldGlow)');
+                    svg.appendChild(pulse);
+
+                    const length = pulse.getTotalLength();
+                    pulse.style.strokeDasharray = `60, ${length}`;
+                    
+                    gsap.to(pulse, {
+                        strokeDashoffset: -length - 60,
+                        opacity: 0.8,
+                        duration: 1.5 + Math.random() * 1,
+                        repeat: -1,
+                        ease: 'none',
+                        delay: Math.random() * 2
+                    });
+                });
+            }
+
+            setTimeout(connectNodes, 200);
+            window.addEventListener('resize', () => setTimeout(connectNodes, 100));
+
+            // Floating Animation
+            nodes.forEach(node => {
+                gsap.to(node, {
+                    y: '+=20',
+                    x: '+=10',
+                    duration: 3 + Math.random() * 2,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: 'sine.inOut'
+                });
+            });
+
+            // Pulse AI Brain
+            gsap.to('#node-brain', {
+                boxShadow: '0 0 50px rgba(212, 175, 55, 0.4)',
+                duration: 2,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            // Counters
+            const counters = document.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                ScrollTrigger.create({
+                    trigger: counter,
+                    start: 'top 90%',
+                    onEnter: () => {
+                        gsap.to(counter, {
+                            innerText: target,
+                            duration: 2,
+                            snap: { innerText: 1 },
+                            ease: 'power2.out',
+                            onUpdate: function() {
+                                counter.innerText = Math.ceil(counter.innerText).toLocaleString();
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Feature Reveal
+            gsap.from('.feature-card', {
+                scrollTrigger: {
+                    trigger: '.features-grid',
+                    start: 'top 80%'
+                },
+                y: 60,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.2,
+                ease: 'power3.out'
+            });
+
+            // About Section Reveal
+            gsap.from('.about-content, .about-tab-card', {
+                scrollTrigger: {
+                    trigger: '.about-section',
+                    start: 'top 70%'
+                },
+                y: 50,
+                opacity: 0,
+                duration: 1.2,
+                stagger: 0.15,
+                ease: 'power3.out'
+            });
+        });
+    </script>
+</body>
+</html>

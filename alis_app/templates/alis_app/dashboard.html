@@ -1,0 +1,369 @@
+{% load static auth_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALIS® | Intelligence OS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'alis_app/css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .xp-bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 100px; margin-top: 0.5rem; overflow: hidden; }
+        .xp-bar-fill { height: 100%; background: var(--gold-primary); box-shadow: 0 0 10px var(--gold-glow); transition: width 0.5s ease; }
+    </style>
+</head>
+<body class="animate-in">
+    <div class="bg-mesh"></div>
+
+    <div class="app-layout">
+        <aside class="sidebar border-glow">
+            <div class="sidebar-logo">ALIS<span>®</span></div>
+            
+            <!-- XP & LEVEL SYSTEM -->
+            <div style="padding: 1.5rem; background: rgba(229, 192, 94, 0.03); border-radius: 12px; border: 1px solid rgba(229, 192, 94, 0.1); margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <div class="text-mono" style="font-size: 0.65rem;">LEVEL {{ user.user_level|default:1 }}</div>
+                    <div class="text-mono" style="font-size: 0.65rem; color: var(--text-muted);">{{ user.xp|default:0 }}/1000 XP</div>
+                </div>
+                <div class="xp-bar-container">
+                    <div class="xp-bar-fill" style="width: {% widthratio user.xp|default:0 1000 100 %}%;"></div>
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    {% for badge in user.badges %}
+                        <div class="achievement-badge" title="{{ badge }}" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                            {% if badge == "Level Up" %}✨{% else %}🏆{% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <nav class="nav-group">
+                <div class="nav-label">Intelligence</div>
+                <a href="{% url 'dashboard' %}" class="nav-item active">Dashboard</a>
+                <a href="{% url 'quiz' %}" class="nav-item">Assessments</a>
+                <a href="#" class="nav-item">Learning DNA</a>
+            </nav>
+
+            <div style="margin-top: auto;">
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; cursor: pointer; text-align: left;">
+                        Log Out
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <main class="main-wrapper">
+            <header class="app-header">
+                <div>
+                    <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 0.5rem;">Cognitive_Session // {% now "M d, Y" %}</div>
+                    <h1 class="h-editorial" style="font-size: 4rem; margin-top: 0.5rem;">Welcome back, {{ user.first_name|default:user.username|split_email }}.</h1>
+                </div>
+                <div style="text-align: right;">
+                    <div class="text-mono" style="color: var(--text-muted); font-size: 0.7rem;">Learning Streak</div>
+                    <div class="h-editorial" style="font-size: 2.5rem; color: var(--gold-primary); margin-top: 0.2rem;">{{ user.streak_days|default:0 }} Days</div>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- AI MENTOR HUB -->
+                <section class="col-12">
+                    <div class="glass-panel border-glow" style="padding: 3.5rem; margin-bottom: 1rem; background: linear-gradient(165deg, rgba(30, 30, 30, 0.8), rgba(10, 10, 10, 0.6));">
+                        <div style="display: flex; gap: 5rem; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <div class="text-mono" style="margin-bottom: 2rem; color: var(--gold-primary); display: flex; align-items: center; gap: 0.75rem;">
+                                    <span style="width: 8px; height: 8px; background: var(--gold-primary); border-radius: 50%; box-shadow: 0 0 10px var(--gold-glow);"></span>
+                                    NEURAL_GUIDANCE_SYSTEM
+                                </div>
+                                <h2 class="h-editorial" style="font-size: 3.5rem; margin-bottom: 2rem; line-height: 1.1;">Neural Path Guidance.</h2>
+                                <p class="text-muted" style="font-size: 1.35rem; line-height: 1.8; max-width: 950px; color: #D1D1D1;">
+                                    Analysis of your <strong>{{ user.last_subject|default:"Learning DNA" }}</strong> proficiency indicates a <strong>{{ user.level|default:"Stable" }}</strong> cognitive state. 
+                                    I recommend a focus on <strong>{{ user.weak_areas|first|default:"foundational nuances" }}</strong> to optimize your next calibration.
+                                </p>
+                                <div style="margin-top: 3.5rem; display: flex; gap: 2rem;">
+                                    <a href="{% url 'quiz' %}" class="btn-premium">Resume Curriculum</a>
+                                    <a href="#" class="btn-ghost">Intelligence Report</a>
+                                </div>
+                            </div>
+                            <div style="width: 300px;">
+                                <div class="glass-panel border-glow" style="padding: 2.5rem; text-align: center; background: rgba(229, 192, 94, 0.05);">
+                                    <div class="text-mono" style="font-size: 0.7rem; margin-bottom: 1rem; opacity: 0.7;">NEXT_SCORE_PREDICTION</div>
+                                    <div class="h-editorial" style="font-size: 3.5rem; color: var(--gold-primary);">{{ predictions.predicted_score|default:75 }}%</div>
+                                    <div style="display: flex; justify-content: space-between; margin-top: 1.5rem;">
+                                        <div class="text-mono" style="font-size: 0.55rem; opacity: 0.6;">READINESS: {{ predictions.readiness }}%</div>
+                                        <div class="text-mono" style="font-size: 0.55rem; opacity: 0.6;">CONFIDENCE: {{ predictions.confidence }}%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VOICE AI TUTOR (FULL FUNCTIONAL) -->
+                <section class="col-4">
+                    <div class="glass-panel border-glow" style="padding: 2.5rem; height: 100%; display: flex; flex-direction: column; background: linear-gradient(145deg, rgba(20, 20, 20, 0.9), rgba(10, 10, 10, 0.8));">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <div class="text-mono" style="font-size: 0.7rem;">VOICE_AI_TUTOR</div>
+                            <div id="micPulse" class="pulse-ring" style="display: none;"></div>
+                        </div>
+
+                        <!-- Learning Mode Selector -->
+                        <div class="mode-selector">
+                            <button class="mode-btn active" data-mode="Beginner">Beginner</button>
+                            <button class="mode-btn" data-mode="Intermediate">Intermed.</button>
+                            <button class="mode-btn" data-mode="Advanced">Advanced</button>
+                        </div>
+                        
+                        <!-- Chat History Container -->
+                        <div id="chatHistory" class="chat-container">
+                            {% for msg in chat_history %}
+                                <div class="chat-bubble {% if msg.role == 'user' %}bubble-user{% else %}bubble-ai{% endif %}">
+                                    {{ msg.content }}
+                                </div>
+                            {% empty %}
+                                <div class="chat-bubble bubble-ai">Hello! I am Alis. How can I assist your learning today?</div>
+                            {% endfor %}
+                        </div>
+
+                        <div id="typingIndicator" class="typing-indicator">Alis is processing...</div>
+
+                        <div class="voice-input-group">
+                            <textarea id="voiceInput" class="voice-textarea" placeholder="Speak or type your question..." rows="2"></textarea>
+                            <button id="sendQuery" class="voice-btn">✦</button>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                            <button id="startVoice" class="btn-premium" style="flex: 1; font-size: 0.75rem;">Initialize Voice Link</button>
+                            <button id="stopVoice" class="btn-ghost" style="display: none; flex: 1; font-size: 0.75rem; color: #FF6B6B; border-color: rgba(255,107,107,0.2);">Stop Listening</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CAREER READINESS INDEX -->
+                <section class="col-8">
+                    <div class="glass-panel border-glow" style="padding: 2.5rem; height: 100%; background: linear-gradient(145deg, rgba(25, 25, 25, 0.8), rgba(15, 15, 15, 0.6));">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
+                            <div class="text-mono" style="font-size: 0.7rem; opacity: 0.6;">CAREER_READINESS_INDEX</div>
+                            <div class="h-editorial" style="font-size: 2.5rem; color: var(--gold-primary);">{{ career_index.overall }}% Overall</div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem;">
+                            <div>
+                                <div class="text-mono" style="font-size: 0.6rem; opacity: 0.7; margin-bottom: 0.5rem;">TECHNICAL PROFICIENCY</div>
+                                <div class="readiness-bar-container">
+                                    <div class="readiness-bar" style="width: {{ career_index.technical }}%;"></div>
+                                </div>
+                                <div class="text-mono" style="font-size: 0.6rem; margin-top: 1.5rem; opacity: 0.7; margin-bottom: 0.5rem;">LOGICAL APTITUDE</div>
+                                <div class="readiness-bar-container">
+                                    <div class="readiness-bar" style="width: {{ career_index.aptitude }}%;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-mono" style="font-size: 0.6rem; opacity: 0.7; margin-bottom: 0.5rem;">COMMUNICATION DYNAMICS</div>
+                                <div class="readiness-bar-container">
+                                    <div class="readiness-bar" style="width: {{ career_index.communication }}%;"></div>
+                                </div>
+                                <div class="text-mono" style="font-size: 0.6rem; margin-top: 1.5rem; opacity: 0.7; margin-bottom: 0.5rem;">COGNITIVE AGILITY</div>
+                                <div class="readiness-bar-container">
+                                    <div class="readiness-bar" style="width: 85%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PERFORMANCE ANALYTICS -->
+                <section class="col-4" style="margin-top: 2rem;">
+                    <div class="glass-panel border-glow" style="padding: 2.5rem; height: 100%;">
+                        <div class="text-mono" style="margin-bottom: 2rem; opacity: 0.6; font-size: 0.7rem;">PERFORMANCE_ANALYTICS</div>
+                        <h3 class="h-editorial" style="font-size: 2.2rem; margin-bottom: 2rem;">Neural Trends.</h3>
+                        <div style="height: 250px;">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                        <div style="margin-top: 2rem;">
+                            <div class="text-mono" style="font-size: 0.65rem; margin-bottom: 1rem; opacity: 0.6;">ASSESSMENT_HISTORY</div>
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                {% for res in history %}
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                                        <span class="text-muted" style="font-size: 0.8rem;">{{ res.assessment.title|truncatechars:20 }}</span>
+                                        <span class="text-mono" style="color: var(--gold-primary); font-size: 0.8rem;">{{ res.score }}%</span>
+                                    </div>
+                                {% empty %}
+                                    <div class="text-muted" style="font-size: 0.8rem; opacity: 0.5;">No assessment history.</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AI STUDY PLANNER -->
+                <section class="col-8" style="margin-top: 2rem;">
+                    <div class="glass-panel border-glow" style="padding: 2.5rem; height: 100%;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+                            <div>
+                                <div class="text-mono" style="margin-bottom: 0.5rem; opacity: 0.6; font-size: 0.7rem;">AI_STUDY_PLANNER</div>
+                                <h3 class="h-editorial" style="font-size: 2.2rem;">Active Curriculum.</h3>
+                            </div>
+                            <div class="text-mono" style="font-size: 0.6rem; opacity: 0.5;">REVISION_MODE: ACTIVE</div>
+                        </div>
+                        
+                        <div class="planner-list">
+                            {% for item in study_plan %}
+                                <div class="planner-item">
+                                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                                        <div style="width: 24px; height: 24px; border: 1px solid var(--gold-dim); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <span style="font-size: 0.7rem; color: var(--gold-primary);">{% if item.priority == 'High' %}!{% else %}○{% endif %}</span>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 1.2rem; color: #FFF; font-family: var(--font-heading);">{{ item.task }}</div>
+                                            <div class="text-mono" style="font-size: 0.6rem; opacity: 0.5; margin-top: 0.2rem;">CALIBRATION_PENDING // {{ item.status }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="priority-badge {% if item.priority == 'High' %}priority-high{% elif item.priority == 'Medium' %}priority-medium{% else %}priority-low{% endif %}">
+                                        {{ item.priority }}
+                                    </span>
+                                </div>
+                            {% empty %}
+                                <div class="text-muted" style="padding: 3rem 0; text-align: center; border: 1px dashed var(--border-dim); border-radius: 12px;">
+                                    Complete an assessment to generate your intelligent study plan.
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="{% static 'alis_app/js/dashboard.js' %}"></script>
+    <script>
+        // Pass data from Django to JS for Analytics
+        const chartData = {
+            labels: [{% for point in user.learning_trend %}"{{ point.date }}",{% endfor %}],
+            scores: [{% for point in user.learning_trend %}{{ point.score }},{% endfor %}]
+        };
+        
+        if (typeof renderChart === 'function') {
+            renderChart(chartData.labels, chartData.scores);
+        }
+
+        // --- VOICE AI TUTOR CORE LOGIC ---
+        const chatHistory = document.getElementById('chatHistory');
+        const voiceInput = document.getElementById('voiceInput');
+        const sendBtn = document.getElementById('sendQuery');
+        const startVoiceBtn = document.getElementById('startVoice');
+        const stopVoiceBtn = document.getElementById('stopVoice');
+        const micPulse = document.getElementById('micPulse');
+        const typingIndicator = document.getElementById('typingIndicator');
+        let currentMode = 'Beginner';
+
+        // Scroll to bottom helper
+        const scrollToBottom = () => { chatHistory.scrollTop = chatHistory.scrollHeight; };
+        scrollToBottom();
+
+        // Mode Selection
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.getAttribute('data-mode');
+            };
+        });
+
+        // Speech Recognition Setup
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                micPulse.style.display = 'block';
+                startVoiceBtn.style.display = 'none';
+                stopVoiceBtn.style.display = 'flex';
+                voiceInput.placeholder = "Listening...";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                voiceInput.value = transcript;
+                handleSend(); // Auto-send on voice success
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech recognition error", event.error);
+                resetVoiceUI();
+            };
+
+            recognition.onend = () => { resetVoiceUI(); };
+        }
+
+        const resetVoiceUI = () => {
+            micPulse.style.display = 'none';
+            startVoiceBtn.style.display = 'flex';
+            stopVoiceBtn.style.display = 'none';
+            voiceInput.placeholder = "Speak or type your question...";
+        };
+
+        startVoiceBtn.onclick = () => { 
+            if (recognition) recognition.start();
+            else alert("Speech Recognition not supported in this browser.");
+        };
+        stopVoiceBtn.onclick = () => { recognition.stop(); };
+
+        // Speech Synthesis
+        const speak = (text) => {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel(); // Stop current speech
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.pitch = 1.1;
+            utterance.rate = 1.0;
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // Message Handling
+        const addMessage = (role, content) => {
+            const div = document.createElement('div');
+            div.className = `chat-bubble ${role === 'user' ? 'bubble-user' : 'bubble-ai'}`;
+            div.innerHTML = content;
+            chatHistory.appendChild(div);
+            scrollToBottom();
+        };
+
+        const handleSend = async () => {
+            const query = voiceInput.value.trim();
+            if (!query) return;
+
+            addMessage('user', query);
+            voiceInput.value = '';
+            typingIndicator.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/ai-tutor/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query, mode: currentMode })
+                });
+                const data = await response.json();
+                typingIndicator.style.display = 'none';
+                
+                if (data.response) {
+                    addMessage('ai', data.response);
+                    speak(data.response);
+                }
+            } catch (err) {
+                typingIndicator.style.display = 'none';
+                addMessage('ai', 'Neural link failure. Please check your connection.');
+            }
+        };
+
+        sendBtn.onclick = handleSend;
+        voiceInput.onkeypress = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } };
+    </script>
+</body>
+</html>

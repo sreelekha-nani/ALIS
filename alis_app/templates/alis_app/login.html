@@ -1,0 +1,452 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALIS® | Choose Your Identity</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'alis_app/css/style.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        body { background: #000; overflow-x: hidden; color: #fff; font-family: 'Inter', sans-serif; }
+
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 2rem;
+            position: relative;
+        }
+
+        /* Screen 1: Role Selection */
+        .role-selection-screen {
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        .screen-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 5vw, 4.5rem);
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .screen-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 4rem;
+            font-weight: 300;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            width: 100%;
+        }
+
+        .role-card {
+            background: rgba(15, 15, 15, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 24px;
+            padding: 4rem 2rem;
+            cursor: pointer;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.5s ease, background 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .role-card:hover {
+            border-color: var(--gold-primary);
+            background: rgba(20, 20, 20, 0.6);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(212, 175, 55, 0.1);
+        }
+
+        .role-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .role-card:hover::before {
+            opacity: 1;
+        }
+
+        .role-icon {
+            font-size: 5rem;
+            margin-bottom: 2.5rem;
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.2));
+            transition: transform 0.5s ease;
+        }
+
+        .role-card:hover .role-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .role-name {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .role-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .role-action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            opacity: 0.8;
+        }
+
+        /* Screen 2: Auth Panel */
+        .auth-panel-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(30px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .auth-card {
+            max-width: 480px;
+            width: 100%;
+            padding: 3.5rem;
+            background: rgba(15, 15, 15, 0.6);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 30px 100px rgba(0,0,0,1);
+            position: relative;
+        }
+
+        .close-auth {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .close-auth:hover { color: #fff; }
+
+        .input-group { margin-bottom: 1.5rem; }
+        .input-label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-secondary); margin-bottom: 0.6rem; }
+        
+        .auth-input {
+            width: 100%;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.2rem;
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .auth-input:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+        }
+
+        .btn-premium {
+            background: var(--gold-dim);
+            color: var(--gold-primary);
+            border: 1px solid var(--gold-dim);
+            padding: 1.2rem;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-premium:hover {
+            background: var(--gold-primary);
+            color: #000;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-ghost-small {
+            background: transparent;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            color: var(--text-secondary);
+            padding: 0.8rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ghost-small:hover {
+            border-color: var(--gold-primary);
+            color: var(--gold-primary);
+        }
+
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .sidebar-logo {
+            position: absolute;
+            top: 3rem;
+            left: 5%;
+            letter-spacing: 0.5em;
+            font-size: 1.6rem;
+            color: #fff;
+            text-decoration: none;
+            z-index: 10;
+        }
+
+        .hidden { display: none; }
+        .error-banner { background: rgba(255, 85, 85, 0.1); border: 1px solid rgba(255, 85, 85, 0.3); color: #ff5555; padding: 1rem; border-radius: 12px; margin-bottom: 2rem; font-size: 0.85rem; text-align: center; }
+
+        @media (max-width: 1024px) {
+            .role-grid { grid-template-columns: 1fr; max-width: 500px; margin: 0 auto; }
+            .auth-container { padding-top: 8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+    <a href="{% url 'showcase' %}" class="sidebar-logo">ALIS<span>®</span></a>
+
+    <div class="auth-container">
+        
+        <!-- ROLE SELECTION -->
+        <div class="role-selection-screen" id="roleSelection">
+            <h1 class="screen-title">Choose Your Identity.</h1>
+            <p class="screen-subtitle">Select your entry point into the Cognitive Operating System.</p>
+
+            <div class="role-grid">
+                <!-- STUDENT -->
+                <div class="role-card" onclick="openAuth('student')">
+                    <div class="role-icon">🎓</div>
+                    <h2 class="role-name">Student Portal</h2>
+                    <p class="role-desc">Access personalized learning pathways, cognitive analytics, and AI tutoring sessions.</p>
+                    <div class="role-action-group">
+                        <button class="btn-premium">Student Login</button>
+                        <button class="btn-ghost-small">Create Learner Account</button>
+                    </div>
+                </div>
+
+                <!-- TEACHER -->
+                <div class="role-card" onclick="openAuth('teacher')">
+                    <div class="role-icon">👨‍🏫</div>
+                    <h2 class="role-name">Teacher Portal</h2>
+                    <p class="role-desc">Manage classrooms, monitor student progress, and oversee intelligent interventions.</p>
+                    <div class="role-action-group">
+                        <button class="btn-premium">Teacher Access</button>
+                        <button class="btn-ghost-small">Institutional Enrollment</button>
+                    </div>
+                </div>
+
+                <!-- ADMIN -->
+                <div class="role-card" onclick="openAuth('admin')">
+                    <div class="role-icon">🛡️</div>
+                    <h2 class="role-name">Admin Portal</h2>
+                    <p class="role-desc">System configuration, infrastructure management, and high-level platform analytics.</p>
+                    <div class="role-action-group">
+                        <button class="btn-premium">Administrator Login</button>
+                        <button class="btn-ghost-small" style="opacity: 0; pointer-events: none;">N/A</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AUTH PANEL (MODAL-STYLE OVERLAY) -->
+        <div class="auth-panel-screen" id="authPanel">
+            <div class="auth-card">
+                <span class="close-auth" onclick="closeAuth()">&times;</span>
+                
+                <!-- LOGIN FORM -->
+                <div id="loginForm">
+                    <div style="text-align: center; margin-bottom: 2.5rem;">
+                        <h2 class="h-editorial" style="font-size: 2.8rem; margin-bottom: 0.5rem;" id="formTitle">Access.</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;" id="formSubtitle">Initialize your session.</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="error-banner">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="login_role" id="loginRole" value="student">
+                        <div class="input-group">
+                            <label class="input-label" id="emailLabel">Student Email</label>
+                            <input type="email" name="username" class="auth-input" placeholder="name@domain.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Access Code</label>
+                            <input type="password" name="password" class="auth-input" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn-premium">Initialize Session</button>
+                    </form>
+                    
+                    <div class="auth-footer" id="signupToggleLink">
+                        New Identity? <a href="#" onclick="toggleAuth()">Enroll in Platform</a>
+                    </div>
+                </div>
+
+                <!-- SIGNUP FORM -->
+                <div id="signupForm" class="hidden">
+                    <div style="text-align: center; margin-bottom: 2.5rem;">
+                        <h2 class="h-editorial" style="font-size: 2.8rem; margin-bottom: 0.5rem;">New Identity.</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Register your cognitive profile.</p>
+                    </div>
+
+                    <form method="POST" action="{% url 'register' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="role" id="signupRole" value="student">
+                        <div class="input-group">
+                            <label class="input-label">Full Identity Name</label>
+                            <input type="text" name="name" class="auth-input" placeholder="Name Label" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Email Access Key</label>
+                            <input type="email" name="username" class="auth-input" placeholder="name@domain.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Access Code</label>
+                            <input type="password" name="password" class="auth-input" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn-premium">Register Identity</button>
+                    </form>
+
+                    <div class="auth-footer">
+                        Existing Identity? <a href="#" onclick="toggleAuth()">Access Platform</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openAuth(role) {
+            const panel = document.getElementById('authPanel');
+            const roleInput = document.getElementById('loginRole');
+            const signupRoleInput = document.getElementById('signupRole');
+            const emailLabel = document.getElementById('emailLabel');
+            const formTitle = document.getElementById('formTitle');
+            const signupToggle = document.getElementById('signupToggleLink');
+
+            // Update state based on role
+            roleInput.value = role;
+            signupRoleInput.value = role;
+            
+            if (role === 'student') {
+                emailLabel.innerText = 'Student Email';
+                formTitle.innerText = 'Student Access.';
+                signupToggle.classList.remove('hidden');
+            } else if (role === 'teacher') {
+                emailLabel.innerText = 'Teacher Email';
+                formTitle.innerText = 'Teacher Access.';
+                signupToggle.classList.remove('hidden');
+            } else {
+                emailLabel.innerText = 'Administrator Email';
+                formTitle.innerText = 'Admin Access.';
+                signupToggle.classList.add('hidden'); // No signup for admin
+            }
+
+            // Animate In
+            gsap.to(panel, { opacity: 1, pointerEvents: 'auto', duration: 0.6, ease: 'power4.out' });
+            gsap.from('.auth-card', { y: 50, opacity: 0, duration: 0.8, ease: 'expo.out', delay: 0.1 });
+        }
+
+        function closeAuth() {
+            const panel = document.getElementById('authPanel');
+            gsap.to(panel, { opacity: 0, pointerEvents: 'none', duration: 0.4, ease: 'power2.in' });
+        }
+
+        function toggleAuth() {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            
+            if (loginForm.classList.contains('hidden')) {
+                gsap.to(signupForm, { opacity: 0, duration: 0.2, onComplete: () => {
+                    signupForm.classList.add('hidden');
+                    loginForm.classList.remove('hidden');
+                    gsap.fromTo(loginForm, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4 });
+                }});
+            } else {
+                gsap.to(loginForm, { opacity: 0, duration: 0.2, onComplete: () => {
+                    loginForm.classList.add('hidden');
+                    signupForm.classList.remove('hidden');
+                    gsap.fromTo(signupForm, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4 });
+                }});
+            }
+        }
+
+        // Entrance animations for cards
+        window.addEventListener('DOMContentLoaded', () => {
+            gsap.from('.screen-title', { y: 30, opacity: 0, duration: 1, ease: 'power4.out', clearProps: 'all' });
+            gsap.from('.screen-subtitle', { y: 20, opacity: 0, duration: 1, ease: 'power4.out', delay: 0.2, clearProps: 'all' });
+            
+            // Fix: Use clearProps to prevent GSAP from leaving lingering inline styles that might conflict,
+            // but ensure the final state is fully visible.
+            gsap.set('.role-card', { opacity: 1, visibility: 'visible' });
+            gsap.from('.role-card', { 
+                y: 60, 
+                opacity: 0, 
+                duration: 1.2, 
+                stagger: 0.2, 
+                ease: 'expo.out', 
+                delay: 0.4,
+                clearProps: 'all' // Removes GSAP inline styles after animation finishes
+            });
+        });
+    </script>
+</body>
+</html>

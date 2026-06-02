@@ -1,0 +1,8 @@
+Place your cinematic background music file here.
+Filename: alis-intro.mp3
+Path: static/alis_app/audio/alis-intro.mp3
+
+Expected mood:
+0-5s: Calm/Inspirational
+5-15s: Technical/AI Discovery
+15-20s: Success/Mastery/Confidence

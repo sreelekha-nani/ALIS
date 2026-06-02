@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALIS® | Create Assessment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'alis_app/css/style.css' %}">
+</head>
+<body class="animate-in">
+    <div class="bg-mesh"></div>
+
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">ALIS<span>®</span></div>
+            <nav class="nav-group">
+                <div class="nav-label">Management</div>
+                <a href="{% url 'teacher_dashboard' %}" class="nav-item">Classroom Center</a>
+                <a href="#" class="nav-item active">New Assessment</a>
+            </nav>
+        </aside>
+
+        <main class="main-wrapper">
+            <header class="app-header">
+                <div>
+                    <div class="text-mono">Assessment Engine // Initialization</div>
+                    <h1 class="h-editorial" style="font-size: 3.5rem; margin-top: 0.5rem;">New Assessment.</h1>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <section class="col-8">
+                    <div class="glass-panel" style="padding: 3rem;">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div style="margin-bottom: 2rem;">
+                                <label class="text-mono" style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 1rem;">Assessment Title</label>
+                                <input type="text" name="title" class="btn-ghost" style="width: 100%; text-align: left; font-size: 1.5rem; font-family: var(--font-heading); background: var(--bg-surface); border: 1px solid var(--border-dim); padding: 1.5rem;" placeholder="e.g. Advanced Calculus Proficiency" required>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+                                <div>
+                                    <label class="text-mono" style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 1rem;">Primary Subject</label>
+                                    <select name="subject" class="btn-ghost" style="width: 100%; appearance: none; background: var(--bg-surface); border: 1px solid var(--border-dim); padding: 1rem;" required>
+                                        {% for subject in subjects %}
+                                            <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-mono" style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 1rem;">Difficulty Framework</label>
+                                    <select name="difficulty" class="btn-ghost" style="width: 100%; appearance: none; background: var(--bg-surface); border: 1px solid var(--border-dim); padding: 1rem;" required>
+                                        <option value="Easy">Easy (Foundational)</option>
+                                        <option value="Medium">Medium (Applied)</option>
+                                        <option value="Hard">Hard (Expert)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style="border-top: 1px solid var(--border-dim); padding-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
+                                <a href="{% url 'teacher_dashboard' %}" class="btn-ghost">Cancel</a>
+                                <button type="submit" class="btn-premium" style="padding: 1rem 3rem;">Publish Assessment</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <section class="col-4">
+                    <div class="glass-panel" style="padding: 2.5rem;">
+                        <div class="text-mono" style="margin-bottom: 1.5rem;">AI Config Suggestion</div>
+                        <p class="text-muted" style="line-height: 1.6;">
+                            Based on current classroom bottlenecks, we recommend creating a <strong>Hard</strong> difficulty assessment focusing on <strong>Calculus</strong> to challenge the top 15% of your learners.
+                        </p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

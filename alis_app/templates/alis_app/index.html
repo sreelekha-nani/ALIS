@@ -1,0 +1,158 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALIS® | Intelligence OS for Education</title>
+    <meta name="description" content="Premium AI-based education platform where learning adapts to every mind.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'alis_app/css/style.css' %}">
+    <style>
+        .landing-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 2.5rem 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 8rem 10% 4rem 10%;
+            position: relative;
+        }
+
+        .tagline-pill {
+            background: rgba(212, 175, 55, 0.08);
+            color: var(--gold-primary);
+            padding: 0.6rem 1.4rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            display: inline-block;
+        }
+
+        .system-preview-frame {
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 6rem;
+            position: relative;
+            padding: 2px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), transparent 40%, rgba(212, 175, 55, 0.1));
+            border-radius: var(--border-radius-lg);
+        }
+
+        .system-preview-content {
+            background: var(--bg-surface);
+            border-radius: calc(var(--border-radius-lg) - 2px);
+            padding: 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            text-align: left;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preview-glow {
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.08), transparent 70%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="animate-in">
+    <div class="bg-mesh"></div>
+
+    <nav class="landing-nav">
+        <div class="sidebar-logo" style="letter-spacing: 0.4em; font-size: 1.4rem;">ALIS<span>®</span></div>
+        <div style="display: flex; gap: 3rem; align-items: center;">
+            <a href="{% url 'login' %}" class="btn-ghost" style="border: none; font-weight: 500; font-size: 0.9rem;">Sign In</a>
+            <a href="{% url 'intro' %}" class="btn-premium" style="padding: 0.8rem 2rem; border-radius: 100px;">Initialize Intelligence</a>
+        </div>
+    </nav>
+
+    <main class="hero-container">
+        <div class="tagline-pill">NEURAL LEARNING OPERATING SYSTEM</div>
+        <h1 class="h-editorial" style="font-size: clamp(4rem, 12vw, 9rem); max-width: 1400px; margin-bottom: 2.5rem;">
+            Intelligence that <br> <span class="text-gradient-gold" style="font-style: italic;">masters</span> itself.
+        </h1>
+        <p class="text-muted" style="max-width: 800px; font-size: 1.4rem; line-height: 1.6; margin-bottom: 4rem; color: #8A8A8A; font-weight: 300;">
+            ALIS bridges the gap between raw potential and academic mastery through real-time cognitive signature analysis.
+        </p>
+        <div style="display: flex; gap: 2rem;">
+            <a href="{% url 'intro' %}" class="btn-premium" style="padding: 1.2rem 3.5rem; font-size: 1.1rem; border-radius: 100px;">Experience the Future</a>
+            <a href="#" class="btn-ghost" style="padding: 1.2rem 3.5rem; font-size: 1.1rem; border-radius: 100px;">Institutional Access</a>
+        </div>
+
+        <div class="system-preview-frame border-glow">
+            <div class="system-preview-content">
+                <div class="preview-glow"></div>
+                <div>
+                    <div class="text-mono" style="margin-bottom: 1.5rem; color: var(--gold-primary);">CORE_SYSTEM_MODULES</div>
+                    <h3 class="h-editorial" style="font-size: 3.5rem; margin-bottom: 2rem; line-height: 1;">Precision Adaptive Learning.</h3>
+                    <p class="text-muted" style="font-size: 1.1rem; margin-bottom: 3rem;">Every interaction recalibrates the entire cognitive roadmap. ALIS identifies unique knowledge gaps and constructs the optimal path to mastery with clinical precision.</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div class="glass-panel" style="padding: 1.5rem; border-color: rgba(255,255,255,0.05);">
+                            <div class="text-mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">ANALYSIS_SPEED</div>
+                            <div class="h-editorial" style="font-size: 1.8rem; color: var(--gold-primary);">0.4ms</div>
+                        </div>
+                        <div class="glass-panel" style="padding: 1.5rem; border-color: rgba(255,255,255,0.05);">
+                            <div class="text-mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">ACCURACY_INDEX</div>
+                            <div class="h-editorial" style="font-size: 1.8rem; color: var(--gold-primary);">99.8%</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: center;">
+                    <div class="glass-panel border-glow" style="width: 100%; height: 400px; display: flex; flex-direction: column; padding: 2rem;">
+                        <div class="text-mono" style="font-size: 0.6rem; opacity: 0.4; margin-bottom: 1rem;">INTELLIGENCE_VIZ_01</div>
+                        <div style="flex: 1; border-left: 1px solid rgba(212,175,55,0.2); position: relative;">
+                            <!-- Abstract High-End Dashboard Graphic -->
+                            <div style="position: absolute; top: 20%; left: 0; width: 80%; height: 2px; background: linear-gradient(to right, var(--gold-primary), transparent);"></div>
+                            <div style="position: absolute; top: 40%; left: 0; width: 60%; height: 2px; background: linear-gradient(to right, var(--gold-primary), transparent); opacity: 0.5;"></div>
+                            <div style="position: absolute; top: 60%; left: 0; width: 90%; height: 2px; background: linear-gradient(to right, var(--gold-primary), transparent); opacity: 0.8;"></div>
+                        </div>
+                        <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: flex-end;">
+                            <div class="text-mono" style="font-size: 0.6rem; color: var(--gold-primary);">STATUS: OPTIMIZING...</div>
+                            <div style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--gold-dim); display: flex; align-items: center; justify-content: center;">
+                                <div style="width: 4px; height: 4px; background: var(--gold-primary); border-radius: 50%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer style="padding: 10rem 10% 5rem 10%; border-top: 1px solid var(--border-dim); background: #050505;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="sidebar-logo" style="opacity: 0.3;">ALIS<span>®</span></div>
+            <div class="text-mono" style="opacity: 0.2; font-size: 0.6rem;">© 2026 ADAPTIVE LEARNING INTELLIGENCE SYSTEM. ALL RIGHTS RESERVED.</div>
+        </div>
+    </footer>
+
+    <script src="{% static 'alis_app/js/main.js' %}"></script>
+</body>
+</html>
