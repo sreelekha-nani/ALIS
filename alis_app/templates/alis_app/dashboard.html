@@ -128,7 +128,7 @@
         type: 'doughnut',
         data: {
             datasets: [{
-                data: [{{ stats.dna_score|default:0 }}, {{ 100|add:stats.dna_score|default:0|add:"-200"|abs }}],
+                data: [{{ stats.dna_score }}, {{ stats.dna_remainder }}],
                 backgroundColor: ['#D4AF37', 'rgba(255,255,255,0.05)'],
                 borderWidth: 0
             }]

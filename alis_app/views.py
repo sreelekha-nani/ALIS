@@ -83,8 +83,10 @@ def student_dashboard(request):
     results = AssessmentResult.objects.filter(student=request.user).order_by('-completed_at')
     
     # Summary Metrics
+    dna_score = request.user.retention_score or 0
     stats = {
-        'dna_score': request.user.retention_score,
+        'dna_score': dna_score,
+        'dna_remainder': 100 - dna_score,
         'ai_readiness': request.user.technical_readiness,
         'completed_count': results.count(),
         'avg_score': sum(r.score for r in results) / results.count() if results.exists() else 0,
