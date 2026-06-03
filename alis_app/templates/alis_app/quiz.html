@@ -1,171 +1,176 @@
+{% extends 'alis_app/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALIS® | Assessment</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'alis_app/css/style.css' %}">
-    <style>
-        .quiz-wrapper {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
 
-        .progress-nano {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--border-dim);
-            z-index: 1000;
-        }
+{% block title %}Assessments | ALIS® Intelligence OS{% endblock %}
 
-        .progress-fill {
-            height: 100%;
-            background: var(--gold-primary);
-            width: 0%;
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 10px var(--gold-glow);
-        }
+{% block header_title %}Cognitive Calibration.{% endblock %}
 
-        .quiz-content {
-            max-width: 700px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .option-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-top: 3rem;
-            text-align: left;
-        }
-
-        .option-btn {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-dim);
-            padding: 1.25rem 1.5rem;
-            border-radius: 8px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .option-btn:hover {
-            border-color: var(--gold-dim);
-            color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .option-btn.selected {
-            border-color: var(--gold-primary);
-            color: var(--gold-primary);
-            background: var(--gold-dim);
-        }
-
-        .subject-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-top: 3rem;
-        }
-
-        .subject-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-dim);
-            padding: 2.5rem 1.5rem;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .subject-card:hover {
-            border-color: var(--gold-primary);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .subject-card h3 {
-            font-family: var(--font-heading);
-            font-size: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .exit-btn {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-        }
-    </style>
-</head>
-<body class="animate-in">
-    <div class="bg-mesh"></div>
-
-    <div class="progress-nano">
-        <div class="progress-fill" id="progressFill"></div>
-    </div>
-
-    <a href="{% url 'dashboard' %}" class="btn-ghost exit-btn">Exit Intelligence Session</a>
-
-    <main class="quiz-wrapper">
-        <!-- Setup Screen -->
-        <div id="setupScreen" class="quiz-content">
-            <div class="text-mono" style="margin-bottom: 1rem;">Neural Initialization</div>
-            <h1 class="h-editorial" style="font-size: 3.5rem;">Select Intelligence Domain.</h1>
-            <p class="text-muted" style="font-size: 1.1rem; margin-top: 1rem;">Choose the framework you wish to calibrate.</p>
-            
-            <div class="subject-grid">
-                <div class="subject-card" onclick="startQuiz('math')">
-                    <div style="font-size: 2rem; color: var(--gold-primary);">📐</div>
-                    <h3>Mathematics</h3>
-                    <div class="text-mono" style="font-size: 0.6rem; margin-top: 0.5rem; opacity: 0.5;">Quantitative Analysis</div>
-                </div>
-                <div class="subject-card" onclick="startQuiz('science')">
-                    <div style="font-size: 2rem; color: var(--gold-primary);">🔬</div>
-                    <h3>Science</h3>
-                    <div class="text-mono" style="font-size: 0.6rem; margin-top: 0.5rem; opacity: 0.5;">Empirical Research</div>
-                </div>
-                <div class="subject-card" onclick="startQuiz('coding')">
-                    <div style="font-size: 2rem; color: var(--gold-primary);">💻</div>
-                    <h3>Compute</h3>
-                    <div class="text-mono" style="font-size: 0.6rem; margin-top: 0.5rem; opacity: 0.5;">Algorithmic Logic</div>
-                </div>
+{% block content %}
+<div class="dashboard-grid">
+    <section id="assessmentList" class="col-12">
+        <div class="glass-panel border-glow" style="padding: 2.5rem;">
+            <div class="text-mono" style="margin-bottom: 2rem; opacity: 0.6;">AVAILABLE_INSTANCES</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
+                {% for assessment in assessments %}
+                    <div class="glass-panel border-glow" style="padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; background: rgba(255,255,255,0.02);">
+                        <div style="flex: 1;">
+                            <div class="text-mono" style="font-size: 0.6rem; color: var(--gold-primary); margin-bottom: 0.75rem;">{{ assessment.subject.name }} // {{ assessment.difficulty }}</div>
+                            <h4 class="h-editorial" style="font-size: 1.8rem; margin-bottom: 1rem;">{{ assessment.title }}</h4>
+                        </div>
+                        <button onclick="startAssessment({{ assessment.id }}, '{{ assessment.title }}')" class="btn-premium" style="width: 100%;">Initialize Link</button>
+                    </div>
+                {% empty %}
+                    <div class="text-muted" style="grid-column: 1 / -1; text-align: center; padding: 4rem;">No active assessment instances detected.</div>
+                {% endfor %}
             </div>
         </div>
+    </section>
 
-        <!-- Quiz Screen -->
-        <div id="quizScreen" class="quiz-content" style="display: none;">
-            <div id="questionContainer">
-                <!-- Dynamically injected by quiz-engine.js -->
+    <!-- Assessment Engine View (Hidden by default) -->
+    <section id="quizEngine" class="col-12" style="display: none;">
+        <div class="glass-panel border-glow" style="padding: 3.5rem; min-height: 600px; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+                <div>
+                    <div id="quizSubject" class="text-mono" style="color: var(--gold-primary); margin-bottom: 0.5rem;">SUBJECT_INSTANCE</div>
+                    <h2 id="quizTitle" class="h-editorial" style="font-size: 2.5rem;">Assessment Title.</h2>
+                </div>
+                <div class="text-mono" id="quizProgress" style="font-size: 1.2rem; color: var(--gold-primary);">01 / 10</div>
+            </div>
+
+            <div id="questionContainer" style="flex: 1;">
+                <p id="questionText" style="font-size: 1.5rem; line-height: 1.6; margin-bottom: 3rem; color: #FFF;"></p>
+                <div id="optionsGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+
+            <div style="margin-top: 4rem; display: flex; justify-content: space-between; align-items: center;">
+                <button id="prevBtn" class="btn-ghost" style="visibility: hidden;">Previous</button>
+                <button id="nextBtn" class="btn-premium">Next Concept</button>
+                <button id="submitBtn" class="btn-premium" style="display: none; background: #28a745; color: #fff; border-color: #28a745;">Finalize DNA Sync</button>
             </div>
         </div>
+    </section>
 
-        <!-- Result Screen -->
-        <div id="resultScreen" class="quiz-content" style="display: none;">
-            <div class="text-mono" style="margin-bottom: 1rem; color: var(--gold-primary);">Calibration Complete</div>
-            <h1 class="h-editorial" style="font-size: 4rem;">Intelligence Synced.</h1>
-            <p id="scoreText" class="text-muted" style="font-size: 1.4rem; margin: 2rem 0;"></p>
-            <div style="display: flex; gap: 1rem; justify-content: center;">
-                <a href="{% url 'dashboard' %}" class="btn-premium">Return to Dashboard</a>
-                <button onclick="location.reload()" class="btn-ghost">Restart Session</button>
-            </div>
+    <!-- Results Modal (Hidden by default) -->
+    <section id="quizResult" class="col-12" style="display: none;">
+        <div class="glass-panel border-glow" style="padding: 4rem; text-align: center;">
+            <div class="text-mono" style="margin-bottom: 2rem; color: var(--gold-primary);">CALIBRATION_COMPLETE</div>
+            <h2 class="h-editorial" style="font-size: 4rem; margin-bottom: 1.5rem;">Synchronized.</h2>
+            <div style="font-size: 5rem; font-family: var(--font-heading); color: var(--gold-primary); margin-bottom: 2rem;" id="finalScore">0%</div>
+            <p class="text-muted" style="font-size: 1.2rem; margin-bottom: 3rem;">Your cognitive DNA has been updated based on this calibration.</p>
+            <a href="{% url 'dashboard' %}" class="btn-premium">Return to Dashboard</a>
         </div>
-    </main>
+    </section>
+</div>
+{% endblock %}
 
-    <script src="{% static 'alis_app/js/quiz-engine.js' %}"></script>
-</body>
-</html>
+{% block extra_js %}
+<script>
+    let currentQuestions = [];
+    let currentIdx = 0;
+    let answers = {};
+    let activeAssessmentId = null;
+
+    async function startAssessment(id, title) {
+        document.getElementById('assessmentList').style.display = 'none';
+        document.getElementById('quizEngine').style.display = 'flex';
+        document.getElementById('quizTitle').innerText = title;
+        activeAssessmentId = id;
+
+        try {
+            const resp = await fetch(`/api/questions/${id}/`);
+            const data = await resp.json();
+            currentQuestions = data.questions;
+            currentIdx = 0;
+            answers = {};
+            renderQuestion();
+        } catch (err) {
+            console.error(err);
+            alert("Failed to initialize assessment instance.");
+        }
+    }
+
+    function renderQuestion() {
+        const q = currentQuestions[currentIdx];
+        document.getElementById('quizProgress').innerText = `${String(currentIdx + 1).padStart(2, '0')} / ${String(currentQuestions.length).padStart(2, '0')}`;
+        document.getElementById('quizSubject').innerText = `CONCEPT_TARGET: ${q.concept}`;
+        document.getElementById('questionText').innerText = q.text;
+
+        const options = ['A', 'B', 'C', 'D'];
+        const grid = document.getElementById('optionsGrid');
+        grid.innerHTML = '';
+
+        options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = `glass-panel border-glow option-btn ${answers[q.id] === opt ? 'selected' : ''}`;
+            btn.style.cssText = "padding: 1.5rem; text-align: left; cursor: pointer; color: #EEE; transition: all 0.3s ease;";
+            btn.innerHTML = `<span class="text-mono" style="margin-right: 1rem; color: var(--gold-primary);">${opt}</span> ${q['options'][idx]}`;
+            btn.onclick = () => selectOption(q.id, opt);
+            grid.appendChild(btn);
+        });
+
+        document.getElementById('prevBtn').style.visibility = currentIdx > 0 ? 'visible' : 'hidden';
+        if (currentIdx === currentQuestions.length - 1) {
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'block';
+        } else {
+            document.getElementById('nextBtn').style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'none';
+        }
+    }
+
+    function selectOption(qId, choice) {
+        answers[qId] = choice;
+        renderQuestion();
+    }
+
+    document.getElementById('nextBtn').onclick = () => {
+        if (currentIdx < currentQuestions.length - 1) {
+            currentIdx++;
+            renderQuestion();
+        }
+    };
+
+    document.getElementById('prevBtn').onclick = () => {
+        if (currentIdx > 0) {
+            currentIdx--;
+            renderQuestion();
+        }
+    };
+
+    document.getElementById('submitBtn').onclick = async () => {
+        const payload = {
+            assessment_id: activeAssessmentId,
+            answers: Object.entries(answers).map(([qId, choice]) => ({ question_id: qId, choice: choice }))
+        };
+
+        try {
+            const resp = await fetch('/save-quiz-result/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await resp.json();
+            if (data.status === 'success') {
+                document.getElementById('quizEngine').style.display = 'none';
+                document.getElementById('quizResult').style.display = 'block';
+                document.getElementById('finalScore').innerText = `${data.score}%`;
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Synchronization failed.");
+        }
+    };
+</script>
+<style>
+    .option-btn.selected {
+        background: var(--gold-dim) !important;
+        border-color: var(--gold-primary) !important;
+        transform: scale(1.02);
+    }
+    .option-btn:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+</style>
+{% endblock %}

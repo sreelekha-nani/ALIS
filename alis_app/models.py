@@ -8,6 +8,7 @@ class User(AbstractUser):
         ('student', 'Student'),
         ('teacher', 'Teacher'),
         ('admin', 'Admin'),
+        ('owner', 'Owner (Super Admin)'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
     
@@ -122,3 +123,72 @@ class RecommendationItem(models.Model):
 
     def __str__(self):
         return f"{self.concept.name} - {self.type} - {self.title}"
+
+class ClassGroup(models.Model):
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='managed_classes')
+    name = models.CharField(max_length=100)
+    students = models.ManyToManyField(User, related_name='enrolled_classes', limit_choices_to={'role': 'student'})
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.teacher.username})"
+
+class Assignment(models.Model):
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_assignments')
+    class_group = models.ForeignKey(ClassGroup, on_delete=models.CASCADE, related_name='assignments')
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    due_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+class Resource(models.Model):
+    TYPE_CHOICES = [
+        ('PDF', 'PDF Document'),
+        ('Video', 'Video Lecture'),
+        ('Note', 'Study Note'),
+        ('Link', 'External Link'),
+    ]
+    ROLE_CHOICES = [
+        ('student', 'Student'),
+        ('teacher', 'Teacher'),
+        ('admin', 'Admin'),
+        ('owner', 'Owner'),
+        ('all', 'All Roles'),
+    ]
+    title = models.CharField(max_length=200)
+    url = models.URLField(blank=True)
+    file = models.FileField(upload_to='resources/', blank=True, null=True)
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    target_role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='all')
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+class AIUsageLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ai_usage_logs')
+    prompt = models.TextField()
+    response_summary = models.TextField()
+    role_context = models.CharField(max_length=20) # student, teacher, etc.
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.timestamp}"
+
+class PlatformMetric(models.Model):
+    date = models.DateField(default=timezone.now)
+    total_users = models.IntegerField(default=0)
+    active_users = models.IntegerField(default=0)
+    revenue = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    ai_requests_count = models.IntegerField(default=0)
+    system_health_score = models.IntegerField(default=100) # 0 to 100
+
+    class Meta:
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"Metrics for {self.date}"

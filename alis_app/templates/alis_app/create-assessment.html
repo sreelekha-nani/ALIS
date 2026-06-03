@@ -1,83 +1,67 @@
+{% extends 'alis_app/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALIS® | Create Assessment</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'alis_app/css/style.css' %}">
-</head>
-<body class="animate-in">
-    <div class="bg-mesh"></div>
 
-    <div class="app-layout">
-        <aside class="sidebar">
-            <div class="sidebar-logo">ALIS<span>®</span></div>
-            <nav class="nav-group">
-                <div class="nav-label">Management</div>
-                <a href="{% url 'teacher_dashboard' %}" class="nav-item">Classroom Center</a>
-                <a href="#" class="nav-item active">New Assessment</a>
-            </nav>
-        </aside>
+{% block title %}Create Assessment | ALIS® Teacher{% endblock %}
 
-        <main class="main-wrapper">
-            <header class="app-header">
-                <div>
-                    <div class="text-mono">Assessment Engine // Initialization</div>
-                    <h1 class="h-editorial" style="font-size: 3.5rem; margin-top: 0.5rem;">New Assessment.</h1>
+{% block header_title %}Create Calibration.{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <section class="col-8">
+        <div class="glass-panel border-glow" style="padding: 3rem;">
+            <div class="text-mono" style="margin-bottom: 2rem; color: var(--gold-primary);">ASSESSMENT_ENGINE // NEW_INSTANCE</div>
+            
+            <form method="POST" style="display: flex; flex-direction: column; gap: 2rem;">
+                {% csrf_token %}
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <label class="text-mono" style="font-size: 0.65rem; opacity: 0.7;">ASSESSMENT TITLE</label>
+                    <input type="text" name="title" required placeholder="e.g., Advanced Database Normalization" 
+                           style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-dim); border-radius: 12px; padding: 1rem 1.5rem; color: #FFF; font-size: 1rem; outline: none; transition: border-color 0.3s ease;">
                 </div>
-            </header>
 
-            <div class="dashboard-grid">
-                <section class="col-8">
-                    <div class="glass-panel" style="padding: 3rem;">
-                        <form method="POST">
-                            {% csrf_token %}
-                            <div style="margin-bottom: 2rem;">
-                                <label class="text-mono" style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 1rem;">Assessment Title</label>
-                                <input type="text" name="title" class="btn-ghost" style="width: 100%; text-align: left; font-size: 1.5rem; font-family: var(--font-heading); background: var(--bg-surface); border: 1px solid var(--border-dim); padding: 1.5rem;" placeholder="e.g. Advanced Calculus Proficiency" required>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
-                                <div>
-                                    <label class="text-mono" style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 1rem;">Primary Subject</label>
-                                    <select name="subject" class="btn-ghost" style="width: 100%; appearance: none; background: var(--bg-surface); border: 1px solid var(--border-dim); padding: 1rem;" required>
-                                        {% for subject in subjects %}
-                                            <option value="{{ subject.id }}">{{ subject.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="text-mono" style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 1rem;">Difficulty Framework</label>
-                                    <select name="difficulty" class="btn-ghost" style="width: 100%; appearance: none; background: var(--bg-surface); border: 1px solid var(--border-dim); padding: 1rem;" required>
-                                        <option value="Easy">Easy (Foundational)</option>
-                                        <option value="Medium">Medium (Applied)</option>
-                                        <option value="Hard">Hard (Expert)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div style="border-top: 1px solid var(--border-dim); padding-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
-                                <a href="{% url 'teacher_dashboard' %}" class="btn-ghost">Cancel</a>
-                                <button type="submit" class="btn-premium" style="padding: 1rem 3rem;">Publish Assessment</button>
-                            </div>
-                        </form>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <label class="text-mono" style="font-size: 0.65rem; opacity: 0.7;">TARGET SUBJECT</label>
+                        <select name="subject" required style="background: rgba(20, 20, 20, 0.95); border: 1px solid var(--border-dim); border-radius: 12px; padding: 1rem 1.5rem; color: #FFF; font-size: 1rem; outline: none;">
+                            {% for subject in subjects %}
+                                <option value="{{ subject.id }}">{{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                </section>
-
-                <section class="col-4">
-                    <div class="glass-panel" style="padding: 2.5rem;">
-                        <div class="text-mono" style="margin-bottom: 1.5rem;">AI Config Suggestion</div>
-                        <p class="text-muted" style="line-height: 1.6;">
-                            Based on current classroom bottlenecks, we recommend creating a <strong>Hard</strong> difficulty assessment focusing on <strong>Calculus</strong> to challenge the top 15% of your learners.
-                        </p>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <label class="text-mono" style="font-size: 0.65rem; opacity: 0.7;">COMPLEXITY LEVEL</label>
+                        <select name="difficulty" required style="background: rgba(20, 20, 20, 0.95); border: 1px solid var(--border-dim); border-radius: 12px; padding: 1rem 1.5rem; color: #FFF; font-size: 1rem; outline: none;">
+                            <option value="Easy">Foundation (Easy)</option>
+                            <option value="Medium" selected>Standard (Medium)</option>
+                            <option value="Hard">Advanced (Hard)</option>
+                        </select>
                     </div>
-                </section>
-            </div>
-        </main>
-    </div>
-</body>
-</html>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <button type="submit" class="btn-premium" style="width: 100%; padding: 1.25rem;">Deploy Assessment Instance</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="col-4">
+        <div class="glass-panel border-glow" style="padding: 2.5rem; height: 100%;">
+            <div class="text-mono" style="margin-bottom: 2rem; opacity: 0.6;">GUIDELINES</div>
+            <h4 class="h-editorial" style="font-size: 1.8rem; margin-bottom: 1.5rem;">Intelligence Calibration.</h4>
+            <ul class="text-muted" style="font-size: 0.95rem; display: flex; flex-direction: column; gap: 1rem; list-style: none;">
+                <li style="display: flex; gap: 0.75rem;"><span style="color: var(--gold-primary);">✦</span> Define clear conceptual targets for accurate DNA tracking.</li>
+                <li style="display: flex; gap: 0.75rem;"><span style="color: var(--gold-primary);">✦</span> Maintain consistent complexity within a single assessment.</li>
+                <li style="display: flex; gap: 0.75rem;"><span style="color: var(--gold-primary);">✦</span> Automated grading and DNA synchronization are active upon deployment.</li>
+            </ul>
+        </div>
+    </section>
+</div>
+
+<style>
+    input:focus, select:focus {
+        border-color: var(--gold-primary) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+</style>
+{% endblock %}

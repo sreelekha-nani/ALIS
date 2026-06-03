@@ -1,0 +1,19 @@
+{% extends 'alis_app/base.html' %}
+
+{% block title %}Module Offline | ALIS® Intelligence OS{% endblock %}
+
+{% block header_title %}System Node.{% endblock %}
+
+{% block content %}
+<div style="height: 60vh; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+    <div class="glass-panel border-glow" style="padding: 4rem; text-align: center; max-width: 600px;">
+        <div class="text-mono" style="margin-bottom: 2rem; color: var(--gold-primary); letter-spacing: 0.2em;">SYSTEM_ALERT // MODULE_OFFLINE</div>
+        <h2 class="h-editorial" style="font-size: 3rem; margin-bottom: 2rem;">Under Construction.</h2>
+        <p class="text-muted" style="font-size: 1.2rem; line-height: 1.6; margin-bottom: 3rem;">
+            This module of the ALIS® Intelligence OS is currently being calibrated for optimal neural delivery. 
+            Please check back in a subsequent system update.
+        </p>
+        <a href="{% url 'dashboard' %}" class="btn-premium">Return to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'alis_app/base.html' %}
+
+{% block title %}Admin Dashboard | ALIS®{% endblock %}
+
+{% block header_title %}System Administration.{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <!-- Platform Stats -->
+    <div class="glass-card" style="grid-column: span 3;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 1rem;">Total_Users</div>
+        <div style="font-size: 3rem; font-weight: 700;">{{ stats.total_users }}</div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">Global accounts</div>
+    </div>
+    <div class="glass-card" style="grid-column: span 3;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 1rem;">Students</div>
+        <div style="font-size: 3rem; font-weight: 700;">{{ stats.student_count }}</div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">Active learners</div>
+    </div>
+    <div class="glass-card" style="grid-column: span 3;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 1rem;">Teachers</div>
+        <div style="font-size: 3rem; font-weight: 700;">{{ stats.teacher_count }}</div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">Active instructors</div>
+    </div>
+    <div class="glass-card" style="grid-column: span 3;">
+        <div class="text-mono" style="color: #4dff88; margin-bottom: 1rem;">Active_Sessions</div>
+        <div style="font-size: 3rem; font-weight: 700; color: #4dff88;">{{ stats.active_sessions }}</div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">Current active links</div>
+    </div>
+
+    <!-- Usage Trends -->
+    <div class="glass-card" style="grid-column: span 8;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 2rem;">Platform_Usage_Trends</div>
+        <canvas id="usageChart" style="max-height: 300px;"></canvas>
+    </div>
+
+    <!-- Recent System Logs -->
+    <div class="glass-card" style="grid-column: span 4;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 2rem;">Security_Audit_Log</div>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for log in logs %}
+            <div style="font-size: 0.8rem; padding: 0.8rem; border-left: 2px solid var(--gold-primary); background: rgba(255,255,255,0.02);">
+                <span style="color: var(--gold-primary);">{{ log.timestamp|date:"H:i" }}</span> - {{ log.message }}
+            </div>
+            {% empty %}
+            <div style="color: var(--text-secondary); text-align: center;">No recent audit logs.</div>
+            {% endfor %}
+            <a href="{% url 'admin_reports' %}" class="btn-gold" style="margin-top: 1rem; padding: 0.8rem; font-size: 0.8rem;">Full Audit Report</a>
+        </div>
+    </div>
+
+    <!-- Quick Management -->
+    <div class="glass-card" style="grid-column: span 12;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 2rem;">Global_Management_Shortcuts</div>
+        <div style="display: flex; gap: 2rem;">
+            <a href="{% url 'admin_users' %}" class="btn-ghost" style="flex: 1; padding: 1.5rem; text-decoration: none; border: 1px solid var(--border-glass); border-radius: 16px; text-align: center; color: white;">Manage Users</a>
+            <a href="{% url 'admin_courses' %}" class="btn-ghost" style="flex: 1; padding: 1.5rem; text-decoration: none; border: 1px solid var(--border-glass); border-radius: 16px; text-align: center; color: white;">Course Catalog</a>
+            <a href="{% url 'admin_ai_monitoring' %}" class="btn-ghost" style="flex: 1; padding: 1.5rem; text-decoration: none; border: 1px solid var(--border-glass); border-radius: 16px; text-align: center; color: white;">AI Monitoring</a>
+            <a href="{% url 'admin_settings' %}" class="btn-ghost" style="flex: 1; padding: 1.5rem; text-decoration: none; border: 1px solid var(--border-glass); border-radius: 16px; text-align: center; color: white;">Global Settings</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('usageChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Active Users',
+                data: [450, 520, 480, 610, 750, 820, 790],
+                borderColor: '#D4AF37',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(212, 175, 55, 0.1)'
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}

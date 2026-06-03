@@ -1,0 +1,118 @@
+{% extends 'alis_app/base.html' %}
+
+{% block title %}Executive Dashboard | ALIS®{% endblock %}
+
+{% block header_title %}Executive Command.{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <!-- Executive KPIs -->
+    <div class="glass-card" style="grid-column: span 3;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 1rem;">Annual_Revenue</div>
+        <div style="font-size: 2.5rem; font-weight: 700;">$1.2M</div>
+        <div style="font-size: 0.8rem; color: #4dff88; margin-top: 0.5rem;">↑ 12.4% from LY</div>
+    </div>
+    <div class="glass-card" style="grid-column: span 3;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 1rem;">User_Growth</div>
+        <div style="font-size: 2.5rem; font-weight: 700;">+2.4k</div>
+        <div style="font-size: 0.8rem; color: #4dff88; margin-top: 0.5rem;">↑ 8.2% MoM</div>
+    </div>
+    <div class="glass-card" style="grid-column: span 3;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 1rem;">Retention_Rate</div>
+        <div style="font-size: 2.5rem; font-weight: 700;">94.2%</div>
+        <div style="font-size: 0.8rem; color: #4dff88; margin-top: 0.5rem;">Stable</div>
+    </div>
+    <div class="glass-card" style="grid-column: span 3;">
+        <div class="text-mono" style="color: #4dff88; margin-bottom: 1rem;">System_Health</div>
+        <div style="font-size: 2.5rem; font-weight: 700; color: #4dff88;">99.9%</div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">All systems operational</div>
+    </div>
+
+    <!-- Revenue Insights -->
+    <div class="glass-card" style="grid-column: span 8;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 2rem;">Revenue_Growth_Intelligence</div>
+        <canvas id="revenueChart" style="max-height: 350px;"></canvas>
+    </div>
+
+    <!-- Platform Monitoring -->
+    <div class="glass-card" style="grid-column: span 4;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 2rem;">Platform_Vitals</div>
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.8rem;">CPU Load</span>
+                    <span style="font-size: 0.8rem; color: var(--gold-primary);">24%</span>
+                </div>
+                <div class="xp-bar-container"><div class="xp-bar-fill" style="width: 24%;"></div></div>
+            </div>
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.8rem;">Database Latency</span>
+                    <span style="font-size: 0.8rem; color: var(--gold-primary);">12ms</span>
+                </div>
+                <div class="xp-bar-container"><div class="xp-bar-fill" style="width: 15%;"></div></div>
+            </div>
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.8rem;">AI Response Time</span>
+                    <span style="font-size: 0.8rem; color: var(--gold-primary);">1.2s</span>
+                </div>
+                <div class="xp-bar-container"><div class="xp-bar-fill" style="width: 40%;"></div></div>
+            </div>
+            <div style="margin-top: 1rem;">
+                <a href="{% url 'owner_system_health' %}" class="btn-gold" style="width: 100%; font-size: 0.8rem; padding: 1rem;">Full System Health</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Executive Navigation -->
+    <div class="glass-card" style="grid-column: span 12;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 2rem;">Strategic_Hub_Directives</div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem;">
+            <a href="{% url 'owner_org_analytics' %}" class="btn-ghost" style="padding: 2rem; text-decoration: none; border: 1px solid var(--border-glass); border-radius: 20px; text-align: center; color: white;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
+                Organization
+            </a>
+            <a href="{% url 'owner_revenue' %}" class="btn-ghost" style="padding: 2rem; text-decoration: none; border: 1px solid var(--border-glass); border-radius: 20px; text-align: center; color: white;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">💰</div>
+                Revenue
+            </a>
+            <a href="{% url 'owner_ai_center' %}" class="btn-ghost" style="padding: 2rem; text-decoration: none; border: 1px solid var(--border-glass); border-radius: 20px; text-align: center; color: white;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🤖</div>
+                AI Center
+            </a>
+            <a href="{% url 'owner_security' %}" class="btn-ghost" style="padding: 2rem; text-decoration: none; border: 1px solid var(--border-glass); border-radius: 20px; text-align: center; color: white;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🛡️</div>
+                Security
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Revenue ($)',
+                data: [65000, 72000, 85000, 78000, 92000, 110000, 105000, 115000, 125000, 140000, 135000, 150000],
+                backgroundColor: 'rgba(212, 175, 55, 0.6)',
+                borderColor: '#D4AF37',
+                borderWidth: 1,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'alis_app/base.html' %}
+{% load static %}
+
+{% block title %}Learning DNA | ALIS® Intelligence OS{% endblock %}
+
+{% block header_title %}Neural Identity. {% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <section class="col-8">
+        <div class="glass-panel border-glow" style="padding: 3rem;">
+            <div class="text-mono" style="margin-bottom: 2rem; color: var(--gold-primary);">COGNITIVE_ARCHITECTURE</div>
+            <h2 class="h-editorial" style="font-size: 3rem; margin-bottom: 2.5rem;">Your Learning DNA.</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
+                <div>
+                    <h4 class="text-mono" style="font-size: 0.65rem; margin-bottom: 1.5rem; opacity: 0.7;">PROXIMAL_STRENGTHS</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                        {% for area in user.weak_areas|slice:":4" %}
+                             <!-- Note: Using weak_areas just for display in placeholder, logic should be improved later -->
+                             <span class="dna-badge badge-strength">Analytical thinking</span>
+                             <span class="dna-badge badge-strength">Pattern Recognition</span>
+                        {% empty %}
+                             <span class="dna-badge badge-strength">Foundational logic</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-mono" style="font-size: 0.65rem; margin-bottom: 1.5rem; opacity: 0.7;">COGNITIVE_GAPS</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                        {% for area in user.weak_areas %}
+                            <span class="dna-badge badge-gap">{{ area }}</span>
+                        {% empty %}
+                            <span class="text-muted" style="font-size: 0.8rem;">No critical gaps identified.</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border-dim);">
+                <div class="text-mono" style="font-size: 0.65rem; margin-bottom: 1.5rem; opacity: 0.7;">DNA_SUMMARY</div>
+                <p class="text-muted" style="font-size: 1.1rem; line-height: 1.8;">
+                    Your neural profile is currently characterized as <strong style="color: var(--gold-primary);">{{ user.learning_dna|default:"Analytical" }}</strong>. 
+                    This indicates a preference for structured data and logical derivation. We are calibrating your curriculum to emphasize these strengths while bridging identified gaps in <strong>{{ user.last_subject|default:"General Studies" }}</strong>.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="col-4">
+        <div class="glass-panel border-glow" style="padding: 2.5rem; text-align: center; background: rgba(229, 192, 94, 0.05); height: 100%;">
+            <div class="text-mono" style="font-size: 0.7rem; margin-bottom: 2rem; opacity: 0.7;">NEURAL_STABILITY</div>
+            <div style="width: 150px; height: 150px; margin: 0 auto; border: 2px solid var(--gold-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px var(--gold-glow);">
+                <div class="h-editorial" style="font-size: 3rem; color: var(--gold-primary);">{{ user.retention_score|floatformat:0 }}%</div>
+            </div>
+            <p class="text-muted" style="margin-top: 2rem; font-size: 0.9rem;">Retention index based on recent calibrations.</p>
+        </div>
+    </section>
+</div>
+{% endblock %}

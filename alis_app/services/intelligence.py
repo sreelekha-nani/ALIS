@@ -19,105 +19,113 @@ else:
 
 class IntelligenceService:
     @staticmethod
-    def voice_ai_response(student, query, mode='Beginner'):
+    def voice_ai_response(student, query, mode='Beginner', history=None):
         """
-        Generates a live AI response using Google Gemini API.
+        Generates a live AI response using Google Gemini API with conversation history.
         """
         if not GEMINI_API_KEY:
-            logger.error("Attempted AI request without GEMINI_API_KEY.")
-            return "My neural core is currently offline (API key missing). Please contact the system administrator."
+            logger.error("CRITICAL: GEMINI_API_KEY missing.")
+            return "Neural link offline. Please configure the AI API Key."
 
         try:
-            # Prompt Engineering based on Mode
-            mode_instructions = {
-                "Beginner": "Explain in simple student-friendly language with relatable examples. Avoid heavy jargon.",
-                "Intermediate": "Provide moderate technical depth with concise definitions and process explanations.",
-                "Advanced": "Provide detailed technical explanation with architectural nuances, performance considerations, and professional terminology."
+            # Mode-specific depth
+            mode_prompts = {
+                "Beginner": "Explain in simple student-friendly terms. Use analogies. Avoid jargon.",
+                "Intermediate": "Provide technical depth with clear definitions and process explanations.",
+                "Advanced": "Provide a rigorous deep-dive with architectural nuances and performance considerations."
             }
+            depth_instruction = mode_prompts.get(mode, mode_prompts['Beginner'])
+
+            # Initialize Model
+            model = genai.GenerativeModel('gemini-2.5-flash')
             
-            instruction = mode_instructions.get(mode, mode_instructions['Beginner'])
+            # Format History
+            chat_context = ""
+            if history:
+                chat_context = "PREVIOUS CONVERSATION:\n"
+                for msg in history:
+                    role_label = "Student" if msg.role == 'user' else "Alis (You)"
+                    chat_context += f"{role_label}: {msg.content}\n"
             
-            system_context = f"""
-            You are Alis, an advanced cognitive AI tutor for the ALIS Intelligence OS. 
-            You are tutoring a student whose current level is {student.level or 'Stable'}.
-            Your task is to: {instruction}
-            Always stay in character as a sophisticated, helpful AI.
-            User Question: {query}
+            # Final Prompt Construction
+            full_prompt = f"""
+            SYSTEM ROLE: You are Alis, an elite AI Cognitive Tutor for the ALIS Intelligence OS.
+            TONE: Professional, authoritative, yet encouraging. Use precise technical terminology.
+            
+            STUDENT_PROFILE:
+            - Level: {student.level or 'Stable'}
+            - Recent Focus: {student.last_subject or 'General Studies'}
+            
+            CONSTRAINTS:
+            1. Provide direct, high-signal answers. Avoid conversational filler or redundant greetings.
+            2. If previous context is provided, maintain a seamless flow without re-introducing yourself.
+            3. Structure complex explanations with clear sections or bullet points if necessary.
+            4. Stay strictly in character as the ALIS Intelligence core.
+
+            {chat_context}
+            STUDENT_QUERY: {query}
+            ALIS_NEURAL_RESPONSE:
             """
 
-            # Initialize Model (gemini-1.5-flash as per latest stable recommendation)
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            
-            logger.info(f"GEMINI REQUEST: Mode={mode}, User={student.email}, Query='{query}'")
+            # Debug Logs
+            logger.info(f"[AI_TUTOR] Request from {student.email} | Mode: {mode}")
+            logger.info(f"[AI_TUTOR] Prompt: {full_prompt[:200]}...") # Log start of prompt
             
             response = model.generate_content(
-                system_context,
+                full_prompt,
                 generation_config=genai.types.GenerationConfig(
                     temperature=0.7,
-                    max_output_tokens=500,
+                    max_output_tokens=800,
                 )
             )
 
             if response and response.text:
-                logger.info(f"GEMINI SUCCESS: Response length={len(response.text)}")
-                return response.text.strip()
+                ai_text = response.text.strip()
+                logger.info(f"[AI_TUTOR] Success | Response Length: {len(ai_text)}")
+                return ai_text
             else:
-                logger.error("GEMINI ERROR: Empty response received.")
-                return "I processed your request but my neural filters returned an empty result. Could you rephrase that?"
+                logger.warning("[AI_TUTOR] Empty response from Gemini.")
+                return "I've processed your query, but my response generation was filtered. Could you try rephrasing?"
 
         except Exception as e:
-            error_msg = str(e)
-            logger.error(f"GEMINI API FAILURE: {error_msg}")
-            
-            if "rate_limit" in error_msg.lower():
-                return "My cognitive circuits are a bit overloaded right now (Rate Limit reached). Let's try again in a moment."
-            elif "timeout" in error_msg.lower():
-                return "The neural link timed out. Please check your connection and retry."
-            
-            return "I encountered a synchronization error while processing your request. My neural link is stabilizing."
+            logger.error(f"[AI_TUTOR] API Error: {str(e)}", exc_info=True)
+            return f"SYSTEM_ERROR: My cognitive processors encountered an issue ({str(e)}). Please try again in a moment."
+
+    @staticmethod
+    def get_recommendations(student):
+        weak_concepts = Concept.objects.filter(name__in=student.weak_areas)
+        recommendations = RecommendationItem.objects.filter(concept__in=weak_concepts)
+        return recommendations
 
     @staticmethod
     def process_assessment_result(student, assessment, answers):
         """
-        answers: list of dicts [{'question_id': id, 'choice': 'A'}]
+        Calculates score and updates student DNA based on quiz performance.
         """
         questions = {q.id: q for q in assessment.questions.all()}
         correct_count = 0
         total_count = len(questions)
-        
-        concept_stats = {} # {concept_id: {total: 0, correct: 0}}
-        
+        concept_stats = {}
+
         for ans in answers:
             q_id = int(ans['question_id'])
             choice = ans['choice']
-            
             if q_id in questions:
                 q = questions[q_id]
                 concept_id = q.concept.id if q.concept else None
-                
                 if concept_id:
                     if concept_id not in concept_stats:
                         concept_stats[concept_id] = {'total': 0, 'correct': 0, 'name': q.concept.name}
                     concept_stats[concept_id]['total'] += 1
-                
                 if q.correct_option == choice:
                     correct_count += 1
                     if concept_id:
                         concept_stats[concept_id]['correct'] += 1
-        
+
         accuracy = int((correct_count / total_count * 100)) if total_count > 0 else 0
-        
-        strong_concepts = []
-        weak_concepts = []
-        
-        for cid, stats in concept_stats.items():
-            concept_accuracy = (stats['correct'] / stats['total'] * 100)
-            if concept_accuracy >= 80:
-                strong_concepts.append(stats['name'])
-            elif concept_accuracy < 50:
-                weak_concepts.append(stats['name'])
-        
-        # Save Result
+        weak_concepts = [stats['name'] for cid, stats in concept_stats.items() if (stats['correct'] / stats['total'] * 100) < 50]
+        strong_concepts = [stats['name'] for cid, stats in concept_stats.items() if (stats['correct'] / stats['total'] * 100) >= 80]
+
         result = AssessmentResult.objects.create(
             student=student,
             assessment=assessment,
@@ -125,88 +133,41 @@ class IntelligenceService:
             strong_concepts=strong_concepts,
             weak_concepts=weak_concepts
         )
-        
-        # Update Student DNA
+
         IntelligenceService.update_student_dna(student, accuracy, weak_concepts, assessment.subject.name)
-        
         return result
 
     @staticmethod
     def update_student_dna(student, last_score, weak_areas, subject_name):
         student.last_quiz_score = last_score
         student.last_subject = subject_name
-        
-        # Merge weak areas
         current_weak = set(student.weak_areas or [])
         current_weak.update(weak_areas)
         student.weak_areas = list(current_weak)
-        
-        # Update Proficiency Level
-        if last_score >= 80:
-            student.level = "Strong"
-        elif last_score >= 50:
-            student.level = "Average"
-        else:
-            student.level = "Weak"
-            
-        # AI Calculations (Simulated logic for prototype)
+
+        if last_score >= 80: student.level = "Strong"
+        elif last_score >= 50: student.level = "Average"
+        else: student.level = "Weak"
+
         student.risk_score = max(0, min(100, (100 - last_score) * 0.8 + (student.risk_score * 0.2)))
         student.learning_speed = 85.0 if last_score > 70 else 60.0
         student.retention_score = last_score * 0.9 + 5
         
-        # XP & Achievement System
         xp_gained = last_score * 10
         student.xp += xp_gained
         student.total_xp += xp_gained
-        
-        # Leveling logic (1000 XP per level)
         if student.xp >= 1000:
             student.user_level += 1
             student.xp -= 1000
-            if "Level Up" not in (student.badges or []):
-                student.badges = (student.badges or []) + ["Level Up"]
-        
-        # Streak Logic
+
         import datetime
-        today = datetime.date.today()
-        if student.last_activity_date:
-            if student.last_activity_date == today - datetime.timedelta(days=1):
-                student.streak_days += 1
-            elif student.last_activity_date < today - datetime.timedelta(days=1):
-                student.streak_days = 1
-        else:
-            student.streak_days = 1
-        student.last_activity_date = today
-
-        # Career Readiness Index Updates
-        if "Coding" in subject_name or "DBMS" in subject_name:
-            student.technical_readiness = min(100, student.technical_readiness * 0.7 + last_score * 0.3)
-        elif "Math" in subject_name or "Logic" in subject_name:
-            student.aptitude_readiness = min(100, student.aptitude_readiness * 0.7 + last_score * 0.3)
-        
-        # Simulated Communication readiness increase
-        student.communication_readiness = min(100, student.communication_readiness + (last_score/20))
-
-        # Update trend
-        trend = student.learning_trend or []
-        trend.append({
-            'date': today.strftime("%Y-%m-%d"),
-            'score': last_score
-        })
-        student.learning_trend = trend[-10:] 
-        
+        student.last_activity_date = datetime.date.today()
         student.save()
 
     @staticmethod
     def get_performance_predictions(student):
-        # Predicted Score: weighted average of trend
         trend = student.learning_trend or []
-        if not trend:
-            return {"predicted_score": 75, "readiness": 60, "confidence": 70}
-        
-        scores = [t['score'] for t in trend]
-        avg_score = sum(scores) / len(scores)
-        
+        avg_score = sum([t['score'] for t in trend]) / len(trend) if trend else 70
         return {
             "predicted_score": int(min(100, avg_score + 5)),
             "readiness": int(student.retention_score * 0.8 + student.learning_speed * 0.2),
@@ -222,67 +183,6 @@ class IntelligenceService:
             "communication": int(student.communication_readiness),
             "overall": int(overall)
         }
-
-    @staticmethod
-    def voice_ai_response(student, query, mode='Beginner'):
-        """
-        Generates a live AI response using Google Gemini API with depth-aware prompt engineering.
-        """
-        if not GEMINI_API_KEY:
-            logger.error("Attempted AI request without GEMINI_API_KEY.")
-            return "My neural core is currently offline (API key missing). Please contact the system administrator."
-
-        try:
-            # Mode-specific technical depth instructions
-            mode_prompts = {
-                "Beginner": "Explain this in very simple, student-friendly terms. Use relatable analogies and metaphors. Avoid technical jargon where possible.",
-                "Intermediate": "Provide a clear technical explanation with moderate depth. Include key definitions and explain how the concept works in practice.",
-                "Advanced": "Provide a rigorous technical deep-dive. Discuss architectural nuances, low-level performance considerations, and professional edge cases."
-            }
-            
-            depth_instruction = mode_prompts.get(mode, mode_prompts['Beginner'])
-            
-            # Construct the system prompt
-            prompt = f"""
-            SYSTEM ROLE: You are Alis, the highly sophisticated AI Tutor for the ALIS Intelligence OS.
-            TARGET AUDIENCE: A student with a current proficiency level of '{student.level or 'Stable'}'.
-            
-            INSTRUCTION: {depth_instruction}
-            
-            CONSTRAINTS:
-            1. Keep the response concise but informative (max 300 words).
-            2. Stay strictly in character as a professional yet encouraging cognitive assistant.
-            3. If the user asks about their performance, refer to their '{student.last_subject or 'recent'}' studies.
-            
-            USER QUERY: {query}
-            """
-
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            
-            logger.info(f"GEMINI LIVE REQUEST: Mode={mode}, Query='{query}'")
-            
-            response = model.generate_content(
-                prompt,
-                generation_config=genai.types.GenerationConfig(
-                    temperature=0.75,
-                    max_output_tokens=600,
-                )
-            )
-
-            if response and response.text:
-                return response.text.strip()
-            else:
-                return "I've analyzed your query, but my neural processors returned an empty response. Please rephrase your question."
-
-        except Exception as e:
-            logger.error(f"GEMINI API FAILURE: {str(e)}")
-            return "My neural link is currently experiencing synchronization issues. Please try again in a few moments."
-
-    @staticmethod
-    def get_recommendations(student):
-        weak_concepts = Concept.objects.filter(name__in=student.weak_areas)
-        recommendations = RecommendationItem.objects.filter(concept__in=weak_concepts)
-        return recommendations
 
     @staticmethod
     def get_study_plan(student):
@@ -328,3 +228,5 @@ class IntelligenceService:
             'common_weaknesses': common_weaknesses, # [(concept, count)]
             'class_avg_accuracy': sum([s.last_quiz_score or 0 for s in students]) / total_students
         }
+
+

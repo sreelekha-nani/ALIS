@@ -1,0 +1,134 @@
+{% load static auth_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ALIS® | Intelligence OS{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'alis_app/css/premium_theme.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="animate-in">
+    <div class="bg-mesh"></div>
+
+    <div class="app-layout">
+        <!-- FIXED SIDEBAR -->
+        <aside class="sidebar border-glow">
+            <div class="sidebar-logo" onclick="window.location.href='{% url 'dashboard' %}'">ALIS<span>®</span></div>
+            
+            <!-- SIDEBAR PROFILE CARD (TOP LEFT) -->
+            <div class="sidebar-user-card" style="margin-bottom: 2rem;">
+                <div class="user-avatar" style="margin-bottom: 1.5rem; width: 60px; height: 60px; font-size: 1.6rem;">
+                    {{ user.first_name|default:user.username|slice:":1"|upper }}
+                </div>
+                
+                <div class="user-info-name">{{ user.first_name|default:user.username|split_email }}</div>
+                <div class="user-info-id">ALIS-{{ user.id|stringformat:"05d" }}</div>
+                <div class="user-info-email">{{ user.email }}</div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                    <div class="text-mono" style="font-size: 0.5rem; opacity: 0.6;">LEVEL {{ user.user_level|default:1 }}</div>
+                    <div class="text-mono" style="font-size: 0.5rem; opacity: 0.6;">{{ user.xp|default:0 }}/1000</div>
+                </div>
+                <div class="xp-bar-container" style="height: 3px; margin-bottom: 1.5rem;">
+                    <div class="xp-bar-fill" style="width: {% widthratio user.xp|default:0 1000 100 %}%;"></div>
+                </div>
+
+                <div class="user-mini-stats">
+                    <div class="mini-stat-item">
+                        <div class="mini-stat-label">Streak</div>
+                        <div class="mini-stat-value">{{ user.streak_days|default:0 }}</div>
+                    </div>
+                    <div class="mini-stat-item">
+                        <div class="mini-stat-label">Badges</div>
+                        <div class="mini-stat-value">{{ user.badges|length|default:0 }}</div>
+                    </div>
+                    <div class="mini-stat-item">
+                        <div class="mini-stat-label">Power</div>
+                        <div class="mini-stat-value">{{ user.last_quiz_score|default:0 }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="nav-group" style="overflow-y: auto; flex: 1; padding-right: 0.5rem; margin-bottom: 0;">
+                {% if user.role == 'student' %}
+                    <div class="nav-label">Navigation</div>
+                    <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+                    <a href="{% url 'ai_tutor' %}" class="nav-item {% if request.resolver_match.url_name == 'ai_tutor' %}active{% endif %}">AI Tutor</a>
+                    <a href="{% url 'learning_dna' %}" class="nav-item {% if request.resolver_match.url_name == 'learning_dna' %}active{% endif %}">Learning DNA</a>
+                    <a href="{% url 'quiz' %}" class="nav-item {% if request.resolver_match.url_name == 'quiz' %}active{% endif %}">Assessments</a>
+                    <a href="{% url 'study_planner' %}" class="nav-item {% if request.resolver_match.url_name == 'study_planner' %}active{% endif %}">Study Planner</a>
+                    <a href="{% url 'analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">Performance</a>
+                    <a href="{% url 'resources' %}" class="nav-item {% if request.resolver_match.url_name == 'resources' %}active{% endif %}">Resources</a>
+                    <a href="{% url 'achievements' %}" class="nav-item {% if request.resolver_match.url_name == 'achievements' %}active{% endif %}">Achievements</a>
+                {% elif user.role == 'teacher' %}
+                    <div class="nav-label">Teaching Center</div>
+                    <a href="{% url 'teacher_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'teacher_dashboard' %}active{% endif %}">Dashboard</a>
+                    <a href="{% url 'teacher_students' %}" class="nav-item {% if request.resolver_match.url_name == 'teacher_students' %}active{% endif %}">Students</a>
+                    <a href="{% url 'teacher_classes' %}" class="nav-item {% if request.resolver_match.url_name == 'teacher_classes' %}active{% endif %}">Classes</a>
+                    <a href="{% url 'teacher_assignments' %}" class="nav-item {% if request.resolver_match.url_name == 'teacher_assignments' %}active{% endif %}">Assignments</a>
+                    <a href="{% url 'create_assessment' %}" class="nav-item {% if request.resolver_match.url_name == 'create_assessment' %}active{% endif %}">Assessments</a>
+                    <a href="{% url 'teacher_performance' %}" class="nav-item {% if request.resolver_match.url_name == 'teacher_performance' %}active{% endif %}">Performance Reports</a>
+                    <a href="{% url 'teacher_ai_insights' %}" class="nav-item {% if request.resolver_match.url_name == 'teacher_ai_insights' %}active{% endif %}">AI Insights</a>
+                    <a href="{% url 'teacher_analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'teacher_analytics' %}active{% endif %}">Learning Analytics</a>
+                {% elif user.role == 'admin' %}
+                    <div class="nav-label">Administration</div>
+                    <a href="{% url 'admin_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">Dashboard</a>
+                    <a href="{% url 'admin_users' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">Users</a>
+                    <a href="{% url 'admin_students' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_students' %}active{% endif %}">Students</a>
+                    <a href="{% url 'admin_teachers' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_teachers' %}active{% endif %}">Teachers</a>
+                    <a href="{% url 'admin_courses' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_courses' %}active{% endif %}">Courses</a>
+                    <a href="{% url 'admin_assessments' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_assessments' %}active{% endif %}">Assessments</a>
+                    <a href="{% url 'admin_reports' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_reports' %}active{% endif %}">Reports</a>
+                    <a href="{% url 'admin_analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_analytics' %}active{% endif %}">Analytics</a>
+                    <a href="{% url 'admin_ai_monitoring' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_ai_monitoring' %}active{% endif %}">AI Monitoring</a>
+                {% elif user.role == 'owner' %}
+                    <div class="nav-label">Executive Hub</div>
+                    <a href="{% url 'owner_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'owner_dashboard' %}active{% endif %}">Executive Dashboard</a>
+                    <a href="{% url 'owner_org_analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'owner_org_analytics' %}active{% endif %}">Organization Analytics</a>
+                    <a href="{% url 'owner_revenue' %}" class="nav-item {% if request.resolver_match.url_name == 'owner_revenue' %}active{% endif %}">Revenue Insights</a>
+                    <a href="{% url 'owner_growth' %}" class="nav-item {% if request.resolver_match.url_name == 'owner_growth' %}active{% endif %}">User Growth</a>
+                    <a href="{% url 'owner_platform_monitoring' %}" class="nav-item {% if request.resolver_match.url_name == 'owner_platform_monitoring' %}active{% endif %}">Platform Monitoring</a>
+                    <a href="{% url 'owner_ai_center' %}" class="nav-item {% if request.resolver_match.url_name == 'owner_ai_center' %}active{% endif %}">AI Intelligence Center</a>
+                    <a href="{% url 'owner_system_health' %}" class="nav-item {% if request.resolver_match.url_name == 'owner_system_health' %}active{% endif %}">System Health</a>
+                    <a href="{% url 'owner_security' %}" class="nav-item {% if request.resolver_match.url_name == 'owner_security' %}active{% endif %}">Security Center</a>
+                {% endif %}
+            </nav>
+
+            <div style="margin-top: auto; display: flex; flex-direction: column; gap: 0.5rem;">
+                <a href="{% url 'settings' %}" class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">Settings</a>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; cursor: pointer; text-align: left; padding: 0.8rem 1rem;">
+                        Log Out
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-wrapper">
+            {% block header %}
+            <header class="app-header">
+                <div>
+                    <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 0.5rem;">Cognitive_Session // {% now "M d, Y" %}</div>
+                    <h1 class="h-editorial" style="font-size: 4rem; margin-top: 0.5rem;">{% block header_title %}Welcome back.{% endblock %}</h1>
+                </div>
+                <div style="text-align: right;">
+                    <div class="text-mono" style="color: var(--text-muted); font-size: 0.7rem;">Learning Streak</div>
+                    <div class="h-editorial" style="font-size: 2.5rem; color: var(--gold-primary); margin-top: 0.2rem;">{{ user.streak_days|default:0 }} Days</div>
+                </div>
+            </header>
+            {% endblock %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% include 'alis_app/ai_assistant_widget.html' %}
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

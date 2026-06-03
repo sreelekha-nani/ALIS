@@ -1,141 +1,97 @@
+{% extends 'alis_app/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALIS® | Student Intelligence Profile</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'alis_app/css/style.css' %}">
-</head>
-<body class="animate-in">
-    <div class="bg-mesh"></div>
 
-    <div class="app-layout">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">ALIS<span>®</span></div>
-            <nav class="nav-group">
-                <div class="nav-label">Management</div>
-                <a href="{% url 'teacher_dashboard' %}" class="nav-item">Classroom Center</a>
-                <a href="#" class="nav-item active">Student Intelligence</a>
-            </nav>
-            <div style="margin-top: auto;">
-                <form action="{% url 'logout' %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; cursor: pointer;">Log Out</button>
-                </form>
+{% block title %}Student DNA | ALIS® Teacher{% endblock %}
+
+{% block header_title %}Neural Inspection.{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <!-- Student Quick Stats -->
+    <section class="col-4">
+        <div class="glass-panel border-glow" style="padding: 3rem; text-align: center;">
+            <div class="text-mono" style="margin-bottom: 2rem; color: var(--gold-primary);">LEARNER_IDENTITY</div>
+            <div style="width: 120px; height: 120px; background: var(--gold-dim); border: 2px solid var(--gold-primary); border-radius: 50%; margin: 0 auto 2rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--gold-primary); box-shadow: 0 0 30px var(--gold-glow);">
+                {{ student.first_name|default:student.username|slice:":1" }}
             </div>
-        </aside>
-
-        <!-- Main Workspace -->
-        <main class="main-wrapper">
-            <header class="app-header">
+            <h2 class="h-editorial" style="font-size: 2.2rem; margin-bottom: 0.5rem;">{{ student.first_name|default:student.username }}</h2>
+            <div class="text-muted" style="margin-bottom: 2rem;">{{ student.email }}</div>
+            
+            <div style="display: flex; justify-content: space-around; border-top: 1px solid var(--border-dim); padding-top: 2rem;">
                 <div>
-                    <div class="text-mono">Intelligence Profile // DNA Analysis</div>
-                    <h1 class="h-editorial" style="font-size: 3.5rem; margin-top: 0.5rem;">{{ student.first_name|default:student.username }}.</h1>
+                    <div class="text-mono" style="font-size: 0.6rem; opacity: 0.6;">LVL</div>
+                    <div style="font-size: 1.5rem; font-family: var(--font-heading); color: var(--gold-primary);">{{ student.user_level }}</div>
                 </div>
-                <div style="text-align: right;">
-                    <div class="text-mono" style="color: var(--text-muted);">Risk Level</div>
-                    <div class="h-editorial" style="font-size: 2rem; color: {% if student.risk_score > 60 %}#ff5555{% else %}var(--gold-primary){% endif %};">
-                        {% if student.risk_score > 60 %}High Risk{% else %}Stable{% endif %}
-                    </div>
+                <div>
+                    <div class="text-mono" style="font-size: 0.6rem; opacity: 0.6;">STREAK</div>
+                    <div style="font-size: 1.5rem; font-family: var(--font-heading); color: var(--gold-primary);">{{ student.streak_days }}</div>
                 </div>
-            </header>
-
-            <div class="dashboard-grid">
-                <!-- Learning DNA -->
-                <section class="col-8">
-                    <div class="glass-panel" style="padding: 2.5rem; height: 100%;">
-                        <div class="text-mono" style="margin-bottom: 1.5rem;">Learning DNA Analysis</div>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
-                            <div class="stat-box">
-                                <div class="stat-label">Learning Speed</div>
-                                <div class="stat-value">{{ student.learning_speed|floatformat:1 }}%</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Retention Score</div>
-                                <div class="stat-value">{{ student.retention_score|floatformat:1 }}%</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Cognitive Type</div>
-                                <div class="stat-value">{{ student.learning_dna }}</div>
-                            </div>
-                        </div>
-                        <div style="margin-top: 3rem;">
-                            <div class="text-mono" style="margin-bottom: 1rem;">AI Intelligence Suggestion</div>
-                            <p class="text-muted" style="font-size: 1.1rem; line-height: 1.7;">
-                                {{ student.first_name }}'s learning trend is <strong>{{ student.level|lower }}</strong>. 
-                                Based on recent assessments, we recommend focusing on <strong>{{ student.weak_areas|join:", "|default:"foundational concepts" }}</strong>. 
-                                The risk score of <strong>{{ student.risk_score|floatformat:1 }}%</strong> suggests that a 1-on-1 review session on {{ student.last_subject }} would be highly effective.
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Mastery Breakdown -->
-                <section class="col-4">
-                    <div class="glass-panel" style="padding: 2.5rem; height: 100%;">
-                        <div class="text-mono" style="margin-bottom: 1.5rem;">Mastery Breakdown</div>
-                        <div style="margin-bottom: 2rem;">
-                            <div class="stat-label">Strong Concepts</div>
-                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
-                                {% for concept in student.assessment_results.last.strong_concepts %}
-                                    <span class="text-mono" style="font-size: 0.65rem; padding: 0.3rem 0.6rem; border: 1px solid var(--gold-primary); color: var(--gold-primary); border-radius: 4px;">{{ concept }}</span>
-                                {% empty %}
-                                    <span class="text-muted" style="font-size: 0.8rem;">No high mastery detected yet.</span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div>
-                            <div class="stat-label">Weak Concepts</div>
-                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
-                                {% for concept in student.weak_areas %}
-                                    <span class="text-mono" style="font-size: 0.65rem; padding: 0.3rem 0.6rem; border: 1px solid #ff5555; color: #ff5555; border-radius: 4px;">{{ concept }}</span>
-                                {% empty %}
-                                    <span class="text-muted" style="font-size: 0.8rem;">No critical weaknesses identified.</span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Activity History -->
-                <section class="col-12" style="margin-top: 2rem;">
-                    <div class="glass-panel" style="padding: 2rem;">
-                        <div class="text-mono" style="margin-bottom: 1.5rem;">Assessment Intelligence History</div>
-                        <table class="luxury-table">
-                            <thead>
-                                <tr>
-                                    <th>Assessment Title</th>
-                                    <th>Date Completed</th>
-                                    <th>Accuracy Score</th>
-                                    <th>Level Achieved</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for result in results %}
-                                <tr>
-                                    <td>{{ result.assessment.title }}</td>
-                                    <td>{{ result.completed_at|date:"M d, Y" }}</td>
-                                    <td>{{ result.score }}%</td>
-                                    <td class="text-mono" style="font-size: 0.7rem; color: var(--gold-primary);">
-                                        {% if result.score >= 80 %}Strong{% elif result.score >= 50 %}Average{% else %}Weak{% endif %}
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" style="text-align: center; padding: 2rem; opacity: 0.5;">No assessment history.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
             </div>
-        </main>
-    </div>
-</body>
-</html>
+        </div>
+    </section>
+
+    <!-- Cognitive DNA Analysis -->
+    <section class="col-8">
+        <div class="glass-panel border-glow" style="padding: 3rem;">
+            <div class="text-mono" style="margin-bottom: 2rem; color: var(--gold-primary);">COGNITIVE_DNA_ANALYSIS</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
+                <div>
+                    <h4 class="text-mono" style="font-size: 0.7rem; margin-bottom: 1.5rem; opacity: 0.8;">PROXIMAL_STRENGTHS</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                        <span class="dna-badge badge-strength">Analytical logic</span>
+                        <span class="dna-badge badge-strength">Technical speed</span>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-mono" style="font-size: 0.7rem; margin-bottom: 1.5rem; opacity: 0.8;">COGNITIVE_GAPS</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                        {% for area in student.weak_areas %}
+                            <span class="dna-badge badge-gap">{{ area }}</span>
+                        {% empty %}
+                            <span class="text-muted" style="font-size: 0.85rem;">No critical gaps identified.</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border-dim);">
+                <div class="text-mono" style="font-size: 0.7rem; margin-bottom: 1.5rem; opacity: 0.6;">NEURAL_READINESS_OVERVIEW</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <div class="text-mono" style="font-size: 0.6rem; opacity: 0.7; margin-bottom: 0.5rem;">TECHNICAL</div>
+                        <div class="readiness-bar-container"><div class="readiness-bar" style="width: {{ student.technical_readiness }}%;"></div></div>
+                    </div>
+                    <div>
+                        <div class="text-mono" style="font-size: 0.6rem; opacity: 0.7; margin-bottom: 0.5rem;">APTITUDE</div>
+                        <div class="readiness-bar-container"><div class="readiness-bar" style="width: {{ student.aptitude_readiness }}%;"></div></div>
+                    </div>
+                    <div>
+                        <div class="text-mono" style="font-size: 0.6rem; opacity: 0.7; margin-bottom: 0.5rem;">COMMUNICATION</div>
+                        <div class="readiness-bar-container"><div class="readiness-bar" style="width: {{ student.communication_readiness }}%;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calibration History -->
+    <section class="col-12" style="margin-top: 2rem;">
+        <div class="glass-panel border-glow" style="padding: 3rem;">
+            <div class="text-mono" style="margin-bottom: 2rem; color: var(--gold-primary);">CALIBRATION_HISTORY</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+                {% for res in results %}
+                    <div style="padding: 1.5rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-dim); border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem;">{{ res.assessment.title }}</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">{{ res.completed_at|date:"M d, Y" }}</div>
+                        </div>
+                        <div class="h-editorial" style="font-size: 1.8rem; color: var(--gold-primary);">{{ res.score }}%</div>
+                    </div>
+                {% empty %}
+                    <div class="text-muted" style="grid-column: 1 / -1; text-align: center; padding: 4rem;">No historical calibrations recorded.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

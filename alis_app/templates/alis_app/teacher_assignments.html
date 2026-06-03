@@ -1,0 +1,60 @@
+{% extends 'alis_app/base.html' %}
+
+{% block title %}Assignments | ALIS®{% endblock %}
+
+{% block header_title %}Tasks & Assignments.{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <div style="grid-column: span 12; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div class="text-mono" style="color: var(--gold-primary);">Active_Tasks // {{ assignments.count }} Pending</div>
+        <button class="btn-gold">New Assignment</button>
+    </div>
+
+    <div class="glass-card" style="grid-column: span 12;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border-glass); color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase;">
+                    <th style="padding: 1rem;">Assignment Title</th>
+                    <th style="padding: 1rem;">Class</th>
+                    <th style="padding: 1rem;">Due Date</th>
+                    <th style="padding: 1rem;">Submissions</th>
+                    <th style="padding: 1rem;">Status</th>
+                    <th style="padding: 1rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assignment in assignments %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <td style="padding: 1.5rem 1rem;">
+                        <div style="font-weight: 600;">{{ assignment.title }}</div>
+                        <div style="font-size: 0.7rem; color: var(--text-secondary);">{{ assignment.description|truncatechars:50 }}</div>
+                    </td>
+                    <td style="padding: 1rem;">{{ assignment.class_group.name }}</td>
+                    <td style="padding: 1rem;">{{ assignment.due_date|date:"M d, Y" }}</td>
+                    <td style="padding: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="font-weight: 600;">12/20</span>
+                            <div class="xp-bar-container" style="width: 50px; height: 4px;"><div class="xp-bar-fill" style="width: 60%;"></div></div>
+                        </div>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <span style="background: rgba(77, 255, 136, 0.1); color: #4dff88; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">ACTIVE</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <div style="display: flex; gap: 1rem;">
+                            <a href="#" style="color: var(--gold-primary); text-decoration: none; font-size: 0.8rem;">Review</a>
+                            <a href="#" style="color: #ff4d4d; text-decoration: none; font-size: 0.8rem;">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-secondary);">No assignments created yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

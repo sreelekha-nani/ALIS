@@ -1,0 +1,38 @@
+{% extends 'alis_app/base.html' %}
+{% load static %}
+
+{% block title %}Analytics | ALIS® Intelligence OS{% endblock %}
+
+{% block header_title %}Cognitive Analytics.{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <section class="col-12">
+        <div class="glass-panel border-glow" style="padding: 2.5rem;">
+            <div class="text-mono" style="margin-bottom: 2rem; opacity: 0.6; font-size: 0.7rem;">HISTORICAL_PERFORMANCE_METRICS</div>
+            <h3 class="h-editorial" style="font-size: 2.2rem; margin-bottom: 2rem;">Calibration History.</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for res in history %}
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="display: flex; gap: 3rem; align-items: center;">
+                            <div class="text-mono" style="color: var(--gold-primary); font-size: 1.2rem; width: 60px;">{{ res.score }}%</div>
+                            <div>
+                                <div style="font-size: 1.1rem; font-weight: 500; margin-bottom: 0.25rem;">{{ res.assessment.title }}</div>
+                                <div class="text-muted" style="font-size: 0.8rem;">{{ res.assessment.subject.name }} // {{ res.completed_at|date:"F d, Y @ H:i" }}</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            {% for concept in res.strong_concepts|slice:":2" %}
+                                <span class="dna-badge badge-strength" style="font-size: 0.6rem;">{{ concept }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-muted" style="padding: 3rem; text-align: center;">No assessment data recorded yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

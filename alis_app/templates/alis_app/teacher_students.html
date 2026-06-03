@@ -1,0 +1,61 @@
+{% extends 'alis_app/base.html' %}
+
+{% block title %}Manage Students | ALIS®{% endblock %}
+
+{% block header_title %}Student Directory.{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <div class="glass-card" style="grid-column: span 12;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div class="text-mono" style="color: var(--gold-primary);">Active_Enrollment // {{ students.count }} Students</div>
+            <div style="display: flex; gap: 1rem;">
+                <input type="text" placeholder="Filter students..." style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.5rem 1rem; color: white;">
+                <button class="btn-gold" style="padding: 0.5rem 1.5rem;">Add Student</button>
+            </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border-glass); color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">
+                    <th style="padding: 1rem;">Student</th>
+                    <th style="padding: 1rem;">Learning DNA</th>
+                    <th style="padding: 1rem;">Readiness</th>
+                    <th style="padding: 1rem;">XP Level</th>
+                    <th style="padding: 1rem;">Last Activity</th>
+                    <th style="padding: 1rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); transition: 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                    <td style="padding: 1.5rem 1rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 40px; height: 40px; background: var(--gold-primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: black; font-weight: 700;">
+                                {{ student.username|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">{{ student.get_full_name|default:student.username }}</div>
+                                <div style="font-size: 0.7rem; color: var(--text-secondary);">{{ student.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding: 1rem;"><span class="text-mono" style="font-size: 0.7rem; color: var(--gold-primary);">{{ student.learning_dna }}</span></td>
+                    <td style="padding: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div class="xp-bar-container" style="width: 60px; height: 4px;"><div class="xp-bar-fill" style="width: {{ student.technical_readiness }}%;"></div></div>
+                            <span style="font-size: 0.8rem;">{{ student.technical_readiness|floatformat:0 }}%</span>
+                        </div>
+                    </td>
+                    <td style="padding: 1rem;">Level {{ student.user_level }}</td>
+                    <td style="padding: 1rem; font-size: 0.8rem; color: var(--text-secondary);">{{ student.last_activity_date|default:"Never" }}</td>
+                    <td style="padding: 1rem;">
+                        <a href="{% url 'student_profile' student.id %}" style="color: var(--gold-primary); text-decoration: none; font-size: 0.8rem; font-weight: 600;">View Profile →</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

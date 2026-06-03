@@ -1,0 +1,218 @@
+{% extends 'alis_app/base.html' %}
+{% load static %}
+
+{% block title %}AI Tutor | ALIS® Intelligence OS{% endblock %}
+
+{% block header_title %}Neural Tutor Session.{% endblock %}
+
+{% block content %}
+<div class="tutor-layout" style="display: grid; grid-template-columns: 320px 1fr; height: calc(100vh - 10rem); gap: 2rem; margin-top: -1rem; position: relative;">
+    
+    <!-- LEFT: PROFILE & SESSION INFO -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <!-- PROFILE CARD -->
+        <div class="sidebar-user-card" style="margin-bottom: 0;">
+            <div class="user-avatar" style="width: 50px; height: 50px; font-size: 1.4rem;">
+                {{ user.first_name|default:user.username|slice:":1"|upper }}
+            </div>
+            <div class="user-info-name" style="font-size: 1.1rem;">{{ user.first_name|default:user.username }}</div>
+            <div class="user-info-email" style="font-size: 0.7rem; margin-bottom: 1rem;">{{ user.email }}</div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                <div class="text-mono" style="font-size: 0.5rem; opacity: 0.6;">LEVEL {{ user.user_level|default:1 }}</div>
+                <div class="text-mono" style="font-size: 0.5rem; opacity: 0.6;">{{ user.xp|default:0 }}/1000</div>
+            </div>
+            <div class="xp-bar-container" style="height: 2px;">
+                <div class="xp-bar-fill" style="width: {% widthratio user.xp|default:0 1000 100 %}%;"></div>
+            </div>
+        </div>
+
+        <!-- RECENT SESSIONS -->
+        <div class="glass-panel" style="flex: 1; padding: 1.5rem; display: flex; flex-direction: column; background: rgba(10, 10, 10, 0.4);">
+            <div class="text-mono" style="font-size: 0.6rem; margin-bottom: 1.5rem; opacity: 0.6;">RECENT_CALIBRATIONS</div>
+            <div class="session-list" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem;">
+                <div class="nav-item active" style="font-size: 0.85rem; padding: 0.75rem 1rem; border-radius: 10px;">
+                    Current Neural Link
+                </div>
+                <div class="text-muted" style="font-size: 0.7rem; padding: 1rem; text-align: center; opacity: 0.4;">
+                    Previous logs archived.
+                </div>
+            </div>
+            <button class="btn-ghost" style="width: 100%; font-size: 0.75rem; margin-top: 1rem; padding: 0.75rem;">New Session +</button>
+        </div>
+    </div>
+
+    <!-- RIGHT: CHAT INTERFACE (ChatGPT Style) -->
+    <div class="glass-panel" style="display: flex; flex-direction: column; position: relative; overflow: hidden; background: rgba(15, 15, 15, 0.4); border-radius: 24px;">
+        
+        <!-- MESSAGES AREA -->
+        <div id="chatHistory" class="chat-container">
+            <!-- Initial Greeting -->
+            <div class="message-wrapper ai">
+                <div class="chat-bubble bubble-ai">
+                    Greetings. I am Alis, your dedicated cognitive tutor. <br><br>
+                    I have initialized a link with your <strong>{{ user.learning_dna|default:"Analytical" }}</strong> profile. How can I assist your calibration today?
+                </div>
+            </div>
+
+            {% for msg in chat_history %}
+                <div class="message-wrapper {% if msg.role == 'user' %}user{% else %}ai{% endif %}">
+                    <div class="chat-bubble {% if msg.role == 'user' %}bubble-user{% else %}bubble-ai{% endif %}">
+                        {{ msg.content|linebreaksbr }}
+                    </div>
+                </div>
+            {% endfor %}
+            <div id="typingIndicator" class="message-wrapper ai" style="display: none;">
+                <div class="chat-bubble bubble-ai" style="opacity: 0.6; font-style: italic;">Alis is generating response...</div>
+            </div>
+        </div>
+
+        <!-- FIXED BOTTOM INPUT AREA -->
+        <div class="chat-input-fixed">
+            <!-- Difficulty Pills -->
+            <div class="mode-pills">
+                <button class="mode-pill active" data-mode="Beginner">Beginner</button>
+                <button class="mode-pill" data-mode="Intermediate">Intermediate</button>
+                <button class="mode-pill" data-mode="Advanced">Advanced</button>
+            </div>
+
+            <div class="chat-input-container">
+                <button id="startVoice" class="chat-action-btn" style="background: none; border: none; color: var(--gold-primary); cursor: pointer; font-size: 1.2rem;">🎤</button>
+                <button id="stopVoice" class="chat-action-btn" style="display: none; background: none; border: none; color: #FF6B6B; cursor: pointer; font-size: 1.2rem;">🛑</button>
+                
+                <textarea id="voiceInput" class="chat-textarea" placeholder="Ask ALIS anything..." rows="1"></textarea>
+                
+                <button id="sendQuery" class="chat-action-btn" style="background: var(--gold-primary); color: #000; border: none; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold;">✦</button>
+            </div>
+            <div class="text-mono" style="font-size: 0.5rem; text-align: center; margin-top: 1rem; opacity: 0.3; letter-spacing: 0.2em;">
+                ALIS® COGNITIVE_TUTOR // ENCRYPTED_NEURAL_LINK
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const chatHistory = document.getElementById('chatHistory');
+    const voiceInput = document.getElementById('voiceInput');
+    const sendBtn = document.getElementById('sendQuery');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const startVoiceBtn = document.getElementById('startVoice');
+    const stopVoiceBtn = document.getElementById('stopVoice');
+    const modePills = document.querySelectorAll('.mode-pill');
+
+    let currentMode = 'Beginner';
+    let recognition;
+
+    // --- MODE SELECTION ---
+    modePills.forEach(pill => {
+        pill.onclick = () => {
+            modePills.forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            currentMode = pill.dataset.mode;
+        };
+    });
+
+    // --- VOICE RECOGNITION ---
+    if ('webkitSpeechRecognition' in window) {
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+            startVoiceBtn.style.display = 'none';
+            stopVoiceBtn.style.display = 'block';
+        };
+
+        recognition.onresult = (event) => {
+            const text = event.results[0][0].transcript;
+            voiceInput.value = text;
+            handleSend();
+        };
+
+        recognition.onerror = () => { stopVoice(); };
+        recognition.onend = () => { stopVoice(); };
+    }
+
+    const startVoice = () => { if(recognition) recognition.start(); };
+    const stopVoice = () => {
+        if(recognition) recognition.stop();
+        startVoiceBtn.style.display = 'block';
+        stopVoiceBtn.style.display = 'none';
+    };
+
+    startVoiceBtn.onclick = startVoice;
+    stopVoiceBtn.onclick = stopVoice;
+
+    // --- SPEECH SYNTHESIS ---
+    const speak = (text) => {
+        const msg = new SpeechSynthesisUtterance();
+        msg.text = text;
+        msg.rate = 1.0;
+        msg.pitch = 1.0;
+        window.speechSynthesis.speak(msg);
+    };
+
+    // --- CHAT LOGIC ---
+    const scrollToBottom = () => { chatHistory.scrollTop = chatHistory.scrollHeight; };
+    scrollToBottom();
+
+    const addMessage = (role, content) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = `message-wrapper ${role}`;
+        
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble bubble-${role}`;
+        bubble.innerHTML = content.replace(/\n/g, '<br>');
+        
+        wrapper.appendChild(bubble);
+        chatHistory.insertBefore(wrapper, typingIndicator);
+        scrollToBottom();
+    };
+
+    const handleSend = async () => {
+        const query = voiceInput.value.trim();
+        if (!query) return;
+
+        addMessage('user', query);
+        voiceInput.value = '';
+        voiceInput.style.height = 'auto';
+        typingIndicator.style.display = 'flex';
+        scrollToBottom();
+
+        try {
+            const response = await fetch('/api/ai-tutor/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: query, mode: currentMode })
+            });
+            const data = await response.json();
+            typingIndicator.style.display = 'none';
+            
+            if (data.response) {
+                addMessage('ai', data.response);
+                speak(data.response);
+            }
+        } catch (err) {
+            typingIndicator.style.display = 'none';
+            addMessage('ai', 'System link failure. Unable to synchronize with neural core.');
+        }
+    };
+
+    sendBtn.onclick = handleSend;
+    voiceInput.onkeypress = (e) => { 
+        if (e.key === 'Enter' && !e.shiftKey) { 
+            e.preventDefault(); 
+            handleSend(); 
+        } 
+    };
+
+    // Auto-resize textarea
+    voiceInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+</script>
+{% endblock %}

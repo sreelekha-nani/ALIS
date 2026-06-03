@@ -1,0 +1,78 @@
+{% extends 'alis_app/base.html' %}
+
+{% block title %}Settings | ALIS®{% endblock %}
+
+{% block header_title %}System Settings.{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <div class="glass-card" style="grid-column: span 8;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 2rem;">Profile_Information</div>
+        
+        <form style="display: flex; flex-direction: column; gap: 2rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Username</label>
+                    <input type="text" value="{{ user.username }}" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: 12px; padding: 1rem; color: white;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Email Address</label>
+                    <input type="email" value="{{ user.email }}" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: 12px; padding: 1rem; color: white;">
+                </div>
+            </div>
+
+            <div>
+                <label style="display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Bio / Learning Objectives</label>
+                <textarea style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: 12px; padding: 1rem; color: white; min-height: 100px;">Passionate about AI and Physics. Goal: Top 1% in Global Science Assessment.</textarea>
+            </div>
+
+            <button type="submit" class="btn-gold" style="width: fit-content;">Save Changes</button>
+        </form>
+
+        <div class="text-mono" style="color: #ff4d4d; margin-top: 4rem; margin-bottom: 2rem;">Danger_Zone</div>
+        <div style="padding: 2rem; border: 1px solid rgba(255, 77, 77, 0.2); border-radius: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div style="font-weight: 600;">Delete Account</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">Once you delete your account, there is no going back. Please be certain.</div>
+            </div>
+            <button style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.5); padding: 0.8rem 1.5rem; border-radius: 12px; cursor: pointer;">Delete Account</button>
+        </div>
+    </div>
+
+    <div class="glass-card" style="grid-column: span 4;">
+        <div class="text-mono" style="color: var(--gold-primary); margin-bottom: 2rem;">Preferences</div>
+        
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-weight: 500;">AI Tutor Voice</div>
+                    <div style="font-size: 0.7rem; color: var(--text-secondary);">Enable voice responses in chat</div>
+                </div>
+                <div style="width: 40px; height: 20px; background: var(--gold-primary); border-radius: 20px; position: relative;">
+                    <div style="width: 16px; height: 16px; background: white; border-radius: 50%; position: absolute; right: 2px; top: 2px;"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-weight: 500;">Email Notifications</div>
+                    <div style="font-size: 0.7rem; color: var(--text-secondary);">Weekly progress reports</div>
+                </div>
+                <div style="width: 40px; height: 20px; background: rgba(255,255,255,0.1); border-radius: 20px; position: relative;">
+                    <div style="width: 16px; height: 16px; background: white; border-radius: 50%; position: absolute; left: 2px; top: 2px;"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-weight: 500;">Learning DNA Sharing</div>
+                    <div style="font-size: 0.7rem; color: var(--text-secondary);">Allow teachers to see DNA</div>
+                </div>
+                <div style="width: 40px; height: 20px; background: var(--gold-primary); border-radius: 20px; position: relative;">
+                    <div style="width: 16px; height: 16px; background: white; border-radius: 50%; position: absolute; right: 2px; top: 2px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

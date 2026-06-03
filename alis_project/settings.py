@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-b3m4&v%lia8e0z#hi-ogb@9-0in3yevggip9=50p!9j393cb-=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -140,6 +140,9 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
-# Ensure localhost and 127.0.0.1 are handled consistently
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
+# Ensure accessibility across local and virtual environments
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000', 'http://0.0.0.0:8000']
+
+# Allow loading in iframes from same origin to prevent chrome-error issues
+X_FRAME_OPTIONS = 'SAMEORIGIN'

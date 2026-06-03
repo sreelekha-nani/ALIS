@@ -1,0 +1,113 @@
+{% extends 'alis_app/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} | ALIS® Intelligence OS{% endblock %}
+
+{% block header_title %}{{ page_title }}.{% endblock %}
+
+{% block content %}
+<div class="dashboard-viewport" style="display: block; overflow-y: auto; padding: 2rem 5rem; height: calc(100vh - 150px);">
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 3rem;">
+        
+        <!-- Left Column -->
+        <div style="display: flex; flex-direction: column; gap: 3rem;">
+            <!-- Main Data Panel -->
+            <div class="glass-panel border-glow" style="padding: 3rem;">
+                <div class="text-mono" style="margin-bottom: 2rem; color: var(--gold-primary);">{{ page_title|upper }}_METRICS</div>
+                <div style="height: 300px; width: 100%;">
+                    <canvas id="genericChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="glass-panel border-glow" style="padding: 3rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div class="text-mono">SYSTEM_RECORDS</div>
+                    <button class="btn-ghost" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Export Data</button>
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-dim); text-align: left;">
+                            <th class="text-mono" style="padding: 1rem; color: var(--text-muted);">ID</th>
+                            <th class="text-mono" style="padding: 1rem; color: var(--text-muted);">Name</th>
+                            <th class="text-mono" style="padding: 1rem; color: var(--text-muted);">Status</th>
+                            <th class="text-mono" style="padding: 1rem; color: var(--text-muted); text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in "12345" %}
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                            <td style="padding: 1rem; color: var(--text-secondary);">REQ-00{{ forloop.counter }}</td>
+                            <td style="padding: 1rem; font-weight: 500;">System Entity {{ forloop.counter }}</td>
+                            <td style="padding: 1rem;"><span class="text-mono" style="color: #4CAF50;">Active</span></td>
+                            <td style="padding: 1rem; text-align: right;"><a href="#" style="color: var(--gold-primary);">View</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div style="display: flex; flex-direction: column; gap: 3rem;">
+            <!-- Summary Stats -->
+            <div class="glass-panel border-glow" style="padding: 3rem;">
+                <div class="text-mono" style="margin-bottom: 2rem; opacity: 0.7;">KPI_OVERVIEW</div>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div style="background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-dim);">
+                        <div class="text-mono" style="font-size: 0.6rem; opacity: 0.6;">TOTAL VOLUME</div>
+                        <div class="h-editorial" style="font-size: 2.5rem; color: var(--gold-primary);">24,592</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-dim);">
+                        <div class="text-mono" style="font-size: 0.6rem; opacity: 0.6;">SYSTEM EFFICIENCY</div>
+                        <div class="h-editorial" style="font-size: 2.5rem; color: #FFF;">98.4%</div>
+                    </div>
+                    <div style="background: rgba(255,85,85,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,85,85,0.1);">
+                        <div class="text-mono" style="font-size: 0.6rem; color: #FF6B6B;">CRITICAL ALERTS</div>
+                        <div class="h-editorial" style="font-size: 2.5rem; color: #FF6B6B;">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="glass-panel border-glow" style="padding: 3rem;">
+                <div class="text-mono" style="margin-bottom: 2rem; opacity: 0.7;">QUICK_ACTIONS</div>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <button class="btn-premium" style="justify-content: center; width: 100%;">Generate Report</button>
+                    <button class="btn-ghost" style="justify-content: center; width: 100%;">Sync Database</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('genericChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Activity',
+                data: [65, 59, 80, 81, 56, 55, 40],
+                backgroundColor: 'rgba(229, 192, 94, 0.2)',
+                borderColor: '#E5C05E',
+                borderWidth: 2,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666' } },
+                x: { grid: { display: false }, ticks: { color: '#666' } }
+            }
+        }
+    });
+</script>
+{% endblock %}
