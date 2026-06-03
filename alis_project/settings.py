@@ -146,3 +146,12 @@ CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000', 'http:
 
 # Allow loading in iframes from same origin to prevent chrome-error issues
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+import os
+
+STATIC_URL = 'static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
